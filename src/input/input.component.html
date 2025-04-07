@@ -1,16 +1,18 @@
 <span class="label">{{ label() }}</span>
 <div
-  class="input-wrapper"
-  [style.--pre-width]="prefixEl.clientWidth + 'px'"
-  [style.--suf-width]="suffixEl.clientWidth + 'px'"
+    class="input-wrapper"
+    [style.--pre-width]="prefixEl.clientWidth + 'px'"
+    [style.--suf-width]="suffixEl.clientWidth + 'px'"
 >
-  <span class="prefix" #prefixEl>{{ prefix() }}</span>
-  <input
-    [type]="type() === 'number' ? 'text' : type()"
-    [value]="value()"
-    [placeholder]="placeholder()"
-    (input)="onValueChangeEvent($event)"
-    (change)="onValueChangeEvent($event)"
-  />
-  <span class="suffix" #suffixEl>{{ suffix() }} </span>
+    <span class="prefix" #prefixEl>{{ prefix() }}</span>
+    <input
+        [type]="type() === 'number' ? 'text' : type()"
+        [value]="value()"
+        [placeholder]="placeholder()"
+        (input)="onValueChangeEvent($event)"
+        (change)="onValueChangeEvent($event)"
+        (focus)="setFocus(true)"
+        (blur)="setFocus(false)"
+    />
+    <span class="suffix" #suffixEl>{{ suffix() }} </span>
 </div>
