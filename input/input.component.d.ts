@@ -1,7 +1,7 @@
-import { OnDestroy, OnInit } from '@angular/core';
-import { Subscription } from 'rxjs';
+import { OnDestroy, OnInit } from "@angular/core";
+import { Subscription } from "rxjs";
 import * as i0 from "@angular/core";
-export type InputType = 'text' | 'number' | 'username' | 'password' | 'email' | 'tel' | 'url';
+export type InputType = "text" | "number" | "username" | "password" | "email" | "tel" | "url";
 export declare class InputComponent implements OnInit, OnDestroy {
     #private;
     min: import("@angular/core").InputSignal<number>;
@@ -17,6 +17,8 @@ export declare class InputComponent implements OnInit, OnDestroy {
     }>;
     prefix: import("@angular/core").InputSignal<string>;
     suffix: import("@angular/core").InputSignal<string>;
+    setFocus(focused: boolean): void;
+    focused: import("@angular/core").Signal<boolean>;
     valueSubscription?: Subscription;
     ngOnInit(): void;
     ngOnDestroy(): void;

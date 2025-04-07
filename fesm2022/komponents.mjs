@@ -164,18 +164,28 @@ class InputComponent {
     min = input(0);
     max = input(100);
     label = input.required();
-    type = input('text');
-    placeholder = input('');
+    type = input("text");
+    placeholder = input("");
     startingValue = input();
     #startingValue$ = toObservable(this.startingValue);
-    value = signal('');
+    value = signal("");
     #value$ = toObservable(this.value).pipe(skip(1));
     valueChanged = output();
-    prefix = input('');
-    suffix = input('');
+    prefix = input("");
+    suffix = input("");
+    #focused = signal(false);
+    #focusTimeout;
+    setFocus(focused) {
+        if (this.#focusTimeout)
+            clearTimeout(this.#focusTimeout);
+        this.#focusTimeout = setTimeout(() => {
+            this.#focused.set(focused);
+        }, 100);
+    }
+    focused = computed(() => this.#focused());
     #updateValue(value) {
-        if (this.type() === 'number') {
-            const cleanedValue = value.toString().replace(/[^0-9.]/g, '');
+        if (this.type() === "number") {
+            const cleanedValue = value.toString().replace(/[^0-9.]/g, "");
             const valueAsNumber = Number(cleanedValue);
             const clampedNumber = Math.min(Math.max(this.min(), valueAsNumber));
             this.value.set(clampedNumber.toString());
@@ -186,20 +196,20 @@ class InputComponent {
     }
     valueSubscription;
     ngOnInit() {
-        this.valueSubscription = this.#value$.subscribe(value => {
+        this.valueSubscription = this.#value$.subscribe((value) => {
             this.valueChanged.emit({
                 value,
                 valueAsNumber: Number(value),
             });
         });
-        this.#startingValue$.subscribe(value => {
+        this.#startingValue$.subscribe((value) => {
             if (value === this.value())
                 return;
             if (value !== undefined) {
                 this.#updateValue(value);
             }
             else {
-                this.#updateValue(this.type() === 'number' ? this.min() : '');
+                this.#updateValue(this.type() === "number" ? this.min() : "");
             }
         });
     }
@@ -211,11 +221,11 @@ class InputComponent {
         this.#updateValue(el.value);
     }
     static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "19.2.5", ngImport: i0, type: InputComponent, deps: [], target: i0.ɵɵFactoryTarget.Component });
-    static ɵcmp = i0.ɵɵngDeclareComponent({ minVersion: "17.1.0", version: "19.2.5", type: InputComponent, isStandalone: true, selector: "k-input", inputs: { min: { classPropertyName: "min", publicName: "min", isSignal: true, isRequired: false, transformFunction: null }, max: { classPropertyName: "max", publicName: "max", isSignal: true, isRequired: false, transformFunction: null }, label: { classPropertyName: "label", publicName: "label", isSignal: true, isRequired: true, transformFunction: null }, type: { classPropertyName: "type", publicName: "type", isSignal: true, isRequired: false, transformFunction: null }, placeholder: { classPropertyName: "placeholder", publicName: "placeholder", isSignal: true, isRequired: false, transformFunction: null }, startingValue: { classPropertyName: "startingValue", publicName: "startingValue", isSignal: true, isRequired: false, transformFunction: null }, prefix: { classPropertyName: "prefix", publicName: "prefix", isSignal: true, isRequired: false, transformFunction: null }, suffix: { classPropertyName: "suffix", publicName: "suffix", isSignal: true, isRequired: false, transformFunction: null } }, outputs: { valueChanged: "valueChanged" }, ngImport: i0, template: "<span class=\"label\">{{ label() }}</span>\n<div\n  class=\"input-wrapper\"\n  [style.--pre-width]=\"prefixEl.clientWidth + 'px'\"\n  [style.--suf-width]=\"suffixEl.clientWidth + 'px'\"\n>\n  <span class=\"prefix\" #prefixEl>{{ prefix() }}</span>\n  <input\n    [type]=\"type() === 'number' ? 'text' : type()\"\n    [value]=\"value()\"\n    [placeholder]=\"placeholder()\"\n    (input)=\"onValueChangeEvent($event)\"\n    (change)=\"onValueChangeEvent($event)\"\n  />\n  <span class=\"suffix\" #suffixEl>{{ suffix() }} </span>\n</div>\n", styles: [":host{display:flex;flex-direction:column;align-items:stretch;gap:8px;margin:8px 0;font-family:Open Sans;font-size:var(--font-size-base);color:#fff}:host span{font-style:normal;font-weight:var(--font-weight-normal);color:inherit}:host span.prefix,:host span.suffix{line-height:var(--font-size-base);font-size:var(--font-size-base)}:host span.prefix:empty,:host span.suffix:empty{display:none}:host input{width:100%;height:100%;outline:none;border:unset;appearance:none;color:inherit;background:transparent;font-size:inherit}:host div.input-wrapper{display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:4px;border:1px solid var(--color-gray-12);background:var(--color-gray-dark)}\n"] });
+    static ɵcmp = i0.ɵɵngDeclareComponent({ minVersion: "17.1.0", version: "19.2.5", type: InputComponent, isStandalone: true, selector: "k-input", inputs: { min: { classPropertyName: "min", publicName: "min", isSignal: true, isRequired: false, transformFunction: null }, max: { classPropertyName: "max", publicName: "max", isSignal: true, isRequired: false, transformFunction: null }, label: { classPropertyName: "label", publicName: "label", isSignal: true, isRequired: true, transformFunction: null }, type: { classPropertyName: "type", publicName: "type", isSignal: true, isRequired: false, transformFunction: null }, placeholder: { classPropertyName: "placeholder", publicName: "placeholder", isSignal: true, isRequired: false, transformFunction: null }, startingValue: { classPropertyName: "startingValue", publicName: "startingValue", isSignal: true, isRequired: false, transformFunction: null }, prefix: { classPropertyName: "prefix", publicName: "prefix", isSignal: true, isRequired: false, transformFunction: null }, suffix: { classPropertyName: "suffix", publicName: "suffix", isSignal: true, isRequired: false, transformFunction: null } }, outputs: { valueChanged: "valueChanged" }, ngImport: i0, template: "<span class=\"label\">{{ label() }}</span>\n<div\n    class=\"input-wrapper\"\n    [style.--pre-width]=\"prefixEl.clientWidth + 'px'\"\n    [style.--suf-width]=\"suffixEl.clientWidth + 'px'\"\n>\n    <span class=\"prefix\" #prefixEl>{{ prefix() }}</span>\n    <input\n        [type]=\"type() === 'number' ? 'text' : type()\"\n        [value]=\"value()\"\n        [placeholder]=\"placeholder()\"\n        (input)=\"onValueChangeEvent($event)\"\n        (change)=\"onValueChangeEvent($event)\"\n        (focus)=\"setFocus(true)\"\n        (blur)=\"setFocus(false)\"\n    />\n    <span class=\"suffix\" #suffixEl>{{ suffix() }} </span>\n</div>\n", styles: [":host{display:flex;flex-direction:column;align-items:stretch;gap:8px;margin:8px 0;font-family:Open Sans;font-size:var(--font-size-base);color:#fff}:host span{font-style:normal;font-weight:var(--font-weight-normal);color:inherit}:host span.prefix,:host span.suffix{line-height:var(--font-size-base);font-size:var(--font-size-base)}:host span.prefix:empty,:host span.suffix:empty{display:none}:host input{width:100%;height:100%;outline:none;border:unset;appearance:none;color:inherit;background:transparent;font-size:inherit}:host div.input-wrapper{display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:4px;border:1px solid var(--color-gray-12);background:var(--color-gray-dark)}\n"] });
 }
 i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.5", ngImport: i0, type: InputComponent, decorators: [{
             type: Component,
-            args: [{ selector: 'k-input', imports: [], template: "<span class=\"label\">{{ label() }}</span>\n<div\n  class=\"input-wrapper\"\n  [style.--pre-width]=\"prefixEl.clientWidth + 'px'\"\n  [style.--suf-width]=\"suffixEl.clientWidth + 'px'\"\n>\n  <span class=\"prefix\" #prefixEl>{{ prefix() }}</span>\n  <input\n    [type]=\"type() === 'number' ? 'text' : type()\"\n    [value]=\"value()\"\n    [placeholder]=\"placeholder()\"\n    (input)=\"onValueChangeEvent($event)\"\n    (change)=\"onValueChangeEvent($event)\"\n  />\n  <span class=\"suffix\" #suffixEl>{{ suffix() }} </span>\n</div>\n", styles: [":host{display:flex;flex-direction:column;align-items:stretch;gap:8px;margin:8px 0;font-family:Open Sans;font-size:var(--font-size-base);color:#fff}:host span{font-style:normal;font-weight:var(--font-weight-normal);color:inherit}:host span.prefix,:host span.suffix{line-height:var(--font-size-base);font-size:var(--font-size-base)}:host span.prefix:empty,:host span.suffix:empty{display:none}:host input{width:100%;height:100%;outline:none;border:unset;appearance:none;color:inherit;background:transparent;font-size:inherit}:host div.input-wrapper{display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:4px;border:1px solid var(--color-gray-12);background:var(--color-gray-dark)}\n"] }]
+            args: [{ selector: "k-input", imports: [], template: "<span class=\"label\">{{ label() }}</span>\n<div\n    class=\"input-wrapper\"\n    [style.--pre-width]=\"prefixEl.clientWidth + 'px'\"\n    [style.--suf-width]=\"suffixEl.clientWidth + 'px'\"\n>\n    <span class=\"prefix\" #prefixEl>{{ prefix() }}</span>\n    <input\n        [type]=\"type() === 'number' ? 'text' : type()\"\n        [value]=\"value()\"\n        [placeholder]=\"placeholder()\"\n        (input)=\"onValueChangeEvent($event)\"\n        (change)=\"onValueChangeEvent($event)\"\n        (focus)=\"setFocus(true)\"\n        (blur)=\"setFocus(false)\"\n    />\n    <span class=\"suffix\" #suffixEl>{{ suffix() }} </span>\n</div>\n", styles: [":host{display:flex;flex-direction:column;align-items:stretch;gap:8px;margin:8px 0;font-family:Open Sans;font-size:var(--font-size-base);color:#fff}:host span{font-style:normal;font-weight:var(--font-weight-normal);color:inherit}:host span.prefix,:host span.suffix{line-height:var(--font-size-base);font-size:var(--font-size-base)}:host span.prefix:empty,:host span.suffix:empty{display:none}:host input{width:100%;height:100%;outline:none;border:unset;appearance:none;color:inherit;background:transparent;font-size:inherit}:host div.input-wrapper{display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:4px;border:1px solid var(--color-gray-12);background:var(--color-gray-dark)}\n"] }]
         }] });
 
 class LabelledCheckboxComponent {
