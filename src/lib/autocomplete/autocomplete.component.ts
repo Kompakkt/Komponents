@@ -2,7 +2,7 @@ import { Component, computed, input } from "@angular/core";
 import { InputComponent } from "../input/input.component";
 
 @Component({
-  selector: "lib-autocomplete",
+  selector: "k-autocomplete",
   standalone: true,
   imports: [],
   templateUrl: "./autocomplete.component.html",
