@@ -1,0 +1,11 @@
+:host {
+    --step-count: 2;
+    &.horizontal {
+        display: grid;
+        grid-template-columns: repeat(var(--step-count), minmax(0, 1fr));
+
+        div.wizard-horizontal {
+            grid-column: span var(--step-count);
+        }
+    }
+}

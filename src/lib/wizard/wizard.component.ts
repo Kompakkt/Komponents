@@ -1,14 +1,29 @@
-import { AfterViewInit, Component, computed, contentChildren, input, signal } from '@angular/core';
-import { WizardStepComponent } from '../wizard-step/wizard-step.component';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  HostBinding,
+  computed,
+  contentChildren,
+  input,
+  signal,
+  viewChild,
+} from "@angular/core";
+import { WizardStepComponent } from "../wizard-step/wizard-step.component";
 
 @Component({
-    selector: 'k-wizard',
-    imports: [],
-    templateUrl: './wizard.component.html',
-    styleUrl: './wizard.component.scss'
+  selector: "k-wizard",
+  imports: [],
+  standalone: true,
+  templateUrl: "./wizard.component.html",
+  styleUrl: "./wizard.component.scss",
 })
 export class WizardComponent implements AfterViewInit {
-  direction = input<'horizontal' | 'vertical'>('horizontal');
+  horizontalContentContainer = viewChild<ElementRef<HTMLDivElement>>(
+    "horizontalContentContainer",
+  );
+
+  direction = input<"horizontal" | "vertical">("horizontal");
   linear = input<boolean>(false);
 
   steps = contentChildren(WizardStepComponent);
@@ -23,13 +38,32 @@ export class WizardComponent implements AfterViewInit {
     return this.steps().at(index % length)!;
   });
 
+  @HostBinding("class.horizontal") get isHorizontal() {
+    return this.direction() === "horizontal";
+  }
+
+  @HostBinding("style.--step-count") get stepCount() {
+    return this.steps().length;
+  }
+
   #setSelectedStep(nextStep: WizardStepComponent) {
     const steps = this.steps();
     for (const step of steps) {
       step.active.set(false);
+      step.direction.set(this.direction());
     }
-    const nextStepIndex = steps.findIndex(step => step.label() === nextStep.label());
+    const nextStepIndex = steps.findIndex(
+      (step) => step.label() === nextStep.label(),
+    );
+
     nextStep.active.set(true);
+    const el = this.horizontalContentContainer();
+    if (el) {
+      console.log(el.nativeElement, nextStep.contentDiv());
+      el.nativeElement.innerHTML =
+        nextStep.contentDiv()?.nativeElement.innerHTML ?? "";
+    }
+
     this.#stepIndex.set(nextStepIndex);
   }
 
@@ -54,13 +88,13 @@ export class WizardComponent implements AfterViewInit {
 
   nextStep() {
     if (this.#stepIndex() < this.steps().length - 1) {
-      this.#stepIndex.update(step => step + 1);
+      this.#stepIndex.update((step) => step + 1);
       this.#setSelectedStep(this.selectedStep());
     }
   }
   prevStep() {
     if (this.#stepIndex() > 0) {
-      this.#stepIndex.update(step => step - 1);
+      this.#stepIndex.update((step) => step - 1);
       this.#setSelectedStep(this.selectedStep());
     }
   }
