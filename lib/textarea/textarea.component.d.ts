@@ -1,5 +1,5 @@
-import { ElementRef } from '@angular/core';
-import { Subscription } from 'rxjs';
+import { ElementRef } from "@angular/core";
+import { Subscription } from "rxjs";
 import * as i0 from "@angular/core";
 export declare class TextareaComponent {
     #private;

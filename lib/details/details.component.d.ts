@@ -1,4 +1,4 @@
-import { AfterViewInit, ElementRef } from '@angular/core';
+import { AfterViewInit, ElementRef } from "@angular/core";
 import * as i0 from "@angular/core";
 export declare class DetailsComponent implements AfterViewInit {
     title: import("@angular/core").InputSignal<string>;

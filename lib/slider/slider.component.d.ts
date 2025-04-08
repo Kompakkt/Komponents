@@ -1,5 +1,5 @@
-import { AfterViewInit, ElementRef, OnDestroy, OnInit } from '@angular/core';
-import { Subscription } from 'rxjs';
+import { AfterViewInit, ElementRef, OnDestroy, OnInit } from "@angular/core";
+import { Subscription } from "rxjs";
 import * as i0 from "@angular/core";
 export declare class SliderComponent implements AfterViewInit, OnInit, OnDestroy {
     #private;

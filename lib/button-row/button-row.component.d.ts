@@ -1,4 +1,4 @@
-import { AfterContentInit, ElementRef } from '@angular/core';
+import { AfterContentInit, ElementRef } from "@angular/core";
 import * as i0 from "@angular/core";
 export declare class ButtonRowComponent implements AfterContentInit {
     el: ElementRef<HTMLDivElement>;

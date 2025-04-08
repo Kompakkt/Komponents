@@ -1,5 +1,5 @@
-import { OnDestroy, OnInit } from '@angular/core';
-import { Subscription } from 'rxjs';
+import { OnDestroy, OnInit } from "@angular/core";
+import { Subscription } from "rxjs";
 import * as i0 from "@angular/core";
 export declare class SlideToggleComponent implements OnInit, OnDestroy {
     label: import("@angular/core").InputSignal<string>;
