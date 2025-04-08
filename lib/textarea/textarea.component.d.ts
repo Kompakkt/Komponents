@@ -16,13 +16,13 @@ export declare class TextareaComponent {
     suffix: import("@angular/core").InputSignal<string>;
     minRows: import("@angular/core").InputSignal<string | number>;
     maxRows: import("@angular/core").InputSignal<string | number>;
-    resize: import("@angular/core").InputSignal<"none" | "both" | "horizontal" | "vertical">;
+    resize: import("@angular/core").InputSignal<"horizontal" | "vertical" | "none" | "both">;
     startingValueChangedEffect: import("@angular/core").EffectRef;
     valueSubscription?: Subscription;
     ngOnInit(): void;
     ngOnDestroy(): void;
     onValueChangeEvent(event: Event): void;
-    get resizeStyle(): "none" | "both" | "horizontal" | "vertical";
+    get resizeStyle(): "horizontal" | "vertical" | "none" | "both";
     get minRowsStyle(): number;
     get maxRowsStyle(): number;
     static ɵfac: i0.ɵɵFactoryDeclaration<TextareaComponent, never>;

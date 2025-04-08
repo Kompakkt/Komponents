@@ -8,6 +8,7 @@ class ButtonRowComponent {
     el = inject(ElementRef);
     buttonCount = signal(2);
     justify = input("space-evenly");
+    direction = input("horizontal");
     gap = input(8);
     ngAfterContentInit() {
         const children = Array.from(this.el.nativeElement.children);
@@ -22,12 +23,15 @@ class ButtonRowComponent {
     get _buttonCount() {
         return this.buttonCount();
     }
+    get _direction() {
+        return this.direction() === "vertical";
+    }
     static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "19.2.5", ngImport: i0, type: ButtonRowComponent, deps: [], target: i0.ɵɵFactoryTarget.Component });
-    static ɵcmp = i0.ɵɵngDeclareComponent({ minVersion: "17.1.0", version: "19.2.5", type: ButtonRowComponent, isStandalone: true, selector: "k-button-row", inputs: { justify: { classPropertyName: "justify", publicName: "justify", isSignal: true, isRequired: false, transformFunction: null }, gap: { classPropertyName: "gap", publicName: "gap", isSignal: true, isRequired: false, transformFunction: null } }, host: { properties: { "style.--justify": "this._justify", "style.--gap": "this._gap", "style.--button-count": "this._buttonCount" } }, ngImport: i0, template: "<ng-content />\n", styles: [":host{--button-count: 2;--justify: space-evenly;--gap: 8px;display:flex;justify-content:var(--justify);gap:var(--gap);width:100%}@supports (width: stretch){:host{width:stretch}}\n"] });
+    static ɵcmp = i0.ɵɵngDeclareComponent({ minVersion: "17.1.0", version: "19.2.5", type: ButtonRowComponent, isStandalone: true, selector: "k-button-row", inputs: { justify: { classPropertyName: "justify", publicName: "justify", isSignal: true, isRequired: false, transformFunction: null }, direction: { classPropertyName: "direction", publicName: "direction", isSignal: true, isRequired: false, transformFunction: null }, gap: { classPropertyName: "gap", publicName: "gap", isSignal: true, isRequired: false, transformFunction: null } }, host: { properties: { "style.--justify": "this._justify", "style.--gap": "this._gap", "style.--button-count": "this._buttonCount", "class.vertical": "this._direction" } }, ngImport: i0, template: "<ng-content />\n", styles: [":host{--button-count: 2;--justify: space-evenly;--gap: 8px;display:flex;justify-content:var(--justify);gap:var(--gap);width:100%}@supports (width: stretch){:host{width:stretch}}:host.vertical{flex-direction:column}\n"] });
 }
 i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.5", ngImport: i0, type: ButtonRowComponent, decorators: [{
             type: Component,
-            args: [{ selector: "k-button-row", standalone: true, imports: [], template: "<ng-content />\n", styles: [":host{--button-count: 2;--justify: space-evenly;--gap: 8px;display:flex;justify-content:var(--justify);gap:var(--gap);width:100%}@supports (width: stretch){:host{width:stretch}}\n"] }]
+            args: [{ selector: "k-button-row", standalone: true, imports: [], template: "<ng-content />\n", styles: [":host{--button-count: 2;--justify: space-evenly;--gap: 8px;display:flex;justify-content:var(--justify);gap:var(--gap);width:100%}@supports (width: stretch){:host{width:stretch}}:host.vertical{flex-direction:column}\n"] }]
         }], propDecorators: { _justify: [{
                 type: HostBinding,
                 args: ["style.--justify"]
@@ -37,6 +41,9 @@ i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.5", ngImpor
             }], _buttonCount: [{
                 type: HostBinding,
                 args: ["style.--button-count"]
+            }], _direction: [{
+                type: HostBinding,
+                args: ["class.vertical"]
             }] } });
 
 const getColor = (color) => {
