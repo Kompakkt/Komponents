@@ -21,6 +21,7 @@ export class ButtonRowComponent implements AfterContentInit {
   justify = input<
     "start" | "center" | "end" | "space-between" | "space-evenly"
   >("space-evenly");
+  direction = input<"horizontal" | "vertical">("horizontal");
   gap = input<number | string>(8);
 
   ngAfterContentInit(): void {
@@ -41,5 +42,10 @@ export class ButtonRowComponent implements AfterContentInit {
   @HostBinding("style.--button-count")
   get _buttonCount() {
     return this.buttonCount();
+  }
+
+  @HostBinding("class.vertical")
+  get _direction() {
+    return this.direction() === "vertical";
   }
 }
