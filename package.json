@@ -2,7 +2,7 @@
   "name": "komponents",
   "version": "0.0.1",
   "scripts": {
-    "build": "ng build komponents && ng build test-page"
+    "build": "ng build komponents && ng build test-page --base-href './'"
   },
   "peerDependencies": {
     "@angular/common": "^19.2.2",
