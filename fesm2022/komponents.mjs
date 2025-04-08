@@ -684,6 +684,20 @@ i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.5", ngImpor
                 args: ['style.--width']
             }] } });
 
+class AutocompleteComponent {
+    inputElement = input.required();
+    opened = computed(() => {
+        const input = this.inputElement();
+        return input.focused();
+    });
+    static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "19.2.5", ngImport: i0, type: AutocompleteComponent, deps: [], target: i0.ɵɵFactoryTarget.Component });
+    static ɵcmp = i0.ɵɵngDeclareComponent({ minVersion: "17.0.0", version: "19.2.5", type: AutocompleteComponent, isStandalone: true, selector: "lib-autocomplete", inputs: { inputElement: { classPropertyName: "inputElement", publicName: "inputElement", isSignal: true, isRequired: true, transformFunction: null } }, ngImport: i0, template: "@if (opened()) {\n    <div class=\"autocomplete-list\">\n        <ng-content />\n    </div>\n}\n", styles: ["div.autocomplete-list{display:flex;pointer-events:all;gap:8px;flex-direction:column;align-items:stretch;max-height:240px;overflow-y:scroll;background:var(--color-bg-transparent, rgba(33, 33, 33, .9411764706));z-index:2;position:absolute;top:100%;left:0;width:calc(100% - 32px);margin:8px;padding:8px;box-sizing:border-box}\n"] });
+}
+i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.5", ngImport: i0, type: AutocompleteComponent, decorators: [{
+            type: Component,
+            args: [{ selector: "lib-autocomplete", standalone: true, imports: [], template: "@if (opened()) {\n    <div class=\"autocomplete-list\">\n        <ng-content />\n    </div>\n}\n", styles: ["div.autocomplete-list{display:flex;pointer-events:all;gap:8px;flex-direction:column;align-items:stretch;max-height:240px;overflow-y:scroll;background:var(--color-bg-transparent, rgba(33, 33, 33, .9411764706));z-index:2;position:absolute;top:100%;left:0;width:calc(100% - 32px);margin:8px;padding:8px;box-sizing:border-box}\n"] }]
+        }] });
+
 /*
  * Public API Surface of komponents
  */
@@ -692,5 +706,5 @@ i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.5", ngImpor
  * Generated bundle index. Do not edit.
  */
 
-export { ButtonComponent, ButtonRowComponent, DetailsComponent, InputComponent, LabelledCheckboxComponent, MenuComponent, MenuOptionComponent, SlideToggleComponent, SliderComponent, TextareaComponent, TooltipComponent, TooltipDirective, WizardComponent, WizardStepComponent };
+export { AutocompleteComponent, ButtonComponent, ButtonRowComponent, DetailsComponent, InputComponent, LabelledCheckboxComponent, MenuComponent, MenuOptionComponent, SlideToggleComponent, SliderComponent, TextareaComponent, TooltipComponent, TooltipDirective, WizardComponent, WizardStepComponent };
 //# sourceMappingURL=komponents.mjs.map
