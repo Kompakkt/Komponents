@@ -24,5 +24,12 @@
   },
   "trustedDependencies": [
     "@parcel/watcher"
-  ]
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Kompakkt/Komponents.git"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  }
 }
