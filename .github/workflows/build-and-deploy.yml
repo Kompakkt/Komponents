@@ -9,14 +9,11 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      packages: write
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # Fetch all history for getting the last commit message
+          fetch-depth: 0  # Fetch all history for getting the last commit message
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
@@ -48,16 +45,3 @@ jobs:
           branch: test-page
           commit-message: "Build output: ${{ steps.last-commit-message.outputs.message }}"
           clean: true
-
-      - name: Setup Node.js for npm publish
-        uses: actions/setup-node@v4
-        with:
-          node-version: "22"
-          registry-url: "https://npm.pkg.github.com"
-          scope: "@Kompakkt"
-
-      - name: Publish to GitHub Packages
-        working-directory: dist/komponents
-        run: npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
