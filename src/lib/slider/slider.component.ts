@@ -31,22 +31,26 @@ import {
   imports: [AsyncPipe],
   templateUrl: "./slider.component.html",
   styleUrl: "./slider.component.scss",
+  host: {
+    "[class.show-info]": "showInfo()",
+    "[class.left-to-right]": 'direction() === "left-to-right"',
+    "[class.bottom-to-top]": 'direction() === "bottom-to-top"',
+  },
 })
 export class SliderComponent implements AfterViewInit, OnInit, OnDestroy {
   label = input.required<string>();
   min = input(0);
   max = input(100);
   startingValue = input(0);
+  showLabel = input(true);
   step = input(0.1);
   value = signal(0);
   value$ = toObservable(this.value).pipe(skip(2));
   valueChanged = output<number>();
+  direction = input<"left-to-right" | "bottom-to-top">("left-to-right");
 
-  startingValueChangedEffect = effect(
-    () => this.value.set(this.startingValue() ?? ""),
-    {
-      allowSignalWrites: true,
-    },
+  startingValueChangedEffect = effect(() =>
+    this.value.set(this.startingValue() ?? ""),
   );
 
   showInfo = input(true);
@@ -97,19 +101,30 @@ export class SliderComponent implements AfterViewInit, OnInit, OnDestroy {
     const railRect = railElement.getBoundingClientRect();
     const handleElement = this.handleRef().nativeElement;
     const handleRect = handleElement.getBoundingClientRect();
-    const clickPosition = event.clientX - railRect.left - handleRect.width / 2;
+
+    const { clickPosition, availableSpace } = (() => {
+      if (this.direction() === "bottom-to-top") {
+        // For vertical slider, use Y coordinates (inverted - bottom is 0, top is max)
+        return {
+          clickPosition:
+            railRect.bottom - event.clientY - handleRect.height / 2,
+          availableSpace: railRect.height - handleRect.height,
+        };
+      } else {
+        // For horizontal slider, use X coordinates
+        return {
+          clickPosition: event.clientX - railRect.left - handleRect.width / 2,
+          availableSpace: railRect.width - handleRect.width,
+        };
+      }
+    })();
+
     const newValue =
-      this.min() +
-      (clickPosition / (railRect.width - handleRect.width)) *
-        (this.max() - this.min());
+      this.min() + (clickPosition / availableSpace) * (this.max() - this.min());
     const steppedValue = Math.round(newValue / this.step()) * this.step();
     const decimalPlacesOfStep =
       this.step().toString().split(".").at(1)?.length ?? 0;
     const roundedValue = parseFloat(steppedValue.toFixed(decimalPlacesOfStep));
     this.value.set(Math.min(Math.max(roundedValue, this.min()), this.max()));
-  }
-
-  @HostBinding("class.show-info") get showInfoClass() {
-    return this.showInfo();
   }
 }

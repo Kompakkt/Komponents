@@ -38,11 +38,8 @@ export class TextareaComponent {
     alias: "resize",
   });
 
-  startingValueChangedEffect = effect(
-    () => this.#updateValue(this.startingValue() ?? ""),
-    {
-      allowSignalWrites: true,
-    },
+  startingValueChangedEffect = effect(() =>
+    this.#updateValue(this.startingValue() ?? ""),
   );
 
   #updateValue(value: string) {
