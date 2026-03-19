@@ -35,7 +35,8 @@
     overflow: hidden;
     gap: var(--gap);
 
-    transition: max-height var(--transition-duration) var(--transition-easing),
+    transition:
+      max-height var(--transition-duration) var(--transition-easing),
       padding var(--transition-duration) var(--transition-easing);
 
     &.opened {

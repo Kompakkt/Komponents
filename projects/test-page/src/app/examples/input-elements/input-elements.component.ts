@@ -1,14 +1,14 @@
-import { Component } from "@angular/core";
+import { Component } from '@angular/core';
 import {
   InputComponent,
   LabelledCheckboxComponent,
   SlideToggleComponent,
   SliderComponent,
   TextareaComponent,
-} from "komponents";
+} from '@kompakkt/komponents';
 
 @Component({
-  selector: "example-input-elements",
+  selector: 'example-input-elements',
   standalone: true,
   imports: [
     InputComponent,
@@ -17,7 +17,7 @@ import {
     SlideToggleComponent,
     LabelledCheckboxComponent,
   ],
-  templateUrl: "./input-elements.component.html",
-  styleUrl: "./input-elements.component.scss",
+  templateUrl: './input-elements.component.html',
+  styleUrl: './input-elements.component.scss',
 })
 export class ExampleInputElementsComponent {}

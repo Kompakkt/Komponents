@@ -1,23 +1,23 @@
 @if (showLabel()) {
-    <span class="label">{{ label() }}</span>
+  <span class="label">{{ label() }}</span>
 }
 <div class="slider-container" [class.show-info]="showInfo()">
-    @if (showInfo()) {
-        <span class="info-value min">{{ min() }}</span>
-    }
-    <div class="slider-rail" #rail>
-        <div
-            #handle
-            class="slider-handle"
-            [style.--moved.%]="handlePosition()"
-            [class.dragging]="isDragging$ | async"
-        >
-            @if (showTooltip()) {
-                <span class="slider-value-tooltip">{{ value() }}</span>
-            }
-        </div>
+  @if (showInfo()) {
+    <span class="info-value min">{{ min() }}</span>
+  }
+  <div class="slider-rail" #rail>
+    <div
+      #handle
+      class="slider-handle"
+      [style.--moved.%]="handlePosition()"
+      [class.dragging]="isDragging$ | async"
+    >
+      @if (showTooltip()) {
+        <span class="slider-value-tooltip">{{ value() }}</span>
+      }
     </div>
-    @if (showInfo()) {
-        <span class="info-value max">{{ max() }}</span>
-    }
+  </div>
+  @if (showInfo()) {
+    <span class="info-value max">{{ max() }}</span>
+  }
 </div>

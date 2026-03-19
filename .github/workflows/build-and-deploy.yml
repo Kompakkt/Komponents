@@ -13,7 +13,7 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Fetch all history for getting the last commit message
+          fetch-depth: 0 # Fetch all history for getting the last commit message
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
@@ -22,7 +22,7 @@ jobs:
         run: bun install
 
       - name: Build Project
-        run: bun run build
+        run: bun run --bun build
 
       - name: Get Last Commit Message
         id: last-commit-message
@@ -30,18 +30,10 @@ jobs:
           MESSAGE=$(git log -1 --pretty=%B)
           echo "message=$MESSAGE" >> $GITHUB_OUTPUT
 
-      - name: Deploy to dist branch
-        uses: JamesIves/github-pages-deploy-action@v4
-        with:
-          folder: dist/komponents
-          branch: dist
-          commit-message: "Build output: ${{ steps.last-commit-message.outputs.message }}"
-          clean: true
-
       - name: Deploy to test-page branch
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           folder: dist/test-page/browser
           branch: test-page
-          commit-message: "Build output: ${{ steps.last-commit-message.outputs.message }}"
+          commit-message: 'Build output: ${{ steps.last-commit-message.outputs.message }}'
           clean: true

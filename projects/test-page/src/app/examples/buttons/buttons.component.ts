@@ -1,11 +1,11 @@
-import { Component } from "@angular/core";
-import { ButtonComponent, ButtonRowComponent } from "komponents";
+import { Component } from '@angular/core';
+import { ButtonComponent, ButtonRowComponent } from '@kompakkt/komponents';
 
 @Component({
-  selector: "example-buttons",
+  selector: 'example-buttons',
   standalone: true,
   imports: [ButtonComponent, ButtonRowComponent],
-  templateUrl: "./buttons.component.html",
-  styleUrl: "./buttons.component.scss",
+  templateUrl: './buttons.component.html',
+  styleUrl: './buttons.component.scss',
 })
 export class ExampleButtonsComponent {}

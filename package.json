@@ -1,28 +1,42 @@
 {
-  "name": "komponents",
+  "name": "@kompakkt/komponents",
   "version": "0.0.1",
   "scripts": {
-    "build": "ng build komponents && ng build test-page --base-href './'"
+    "build": "ng build test-page --base-href './'",
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix",
+    "format": "oxfmt",
+    "format:check": "oxfmt --check"
   },
+  "private": true,
+  "engines": {
+    "bun": ">=1.0.0"
+  },
+  "packageManager": "^bun@1.0.0",
   "peerDependencies": {
-    "@angular/common": "^19.2.2",
-    "@angular/core": "^19.2.2",
-    "@angular/platform-browser": "^19.2.5",
-    "@angular/forms": "^19.2.5",
-    "rxjs": "^7.8.2"
+    "@angular/common": "19.2.20",
+    "@angular/core": "19.2.20",
+    "@angular/platform-browser": "19.2.20",
+    "@angular/forms": "19.2.20",
+    "rxjs": "7.8.2"
   },
   "dependencies": {
     "tslib": "^2.3.0"
   },
-  "sideEffects": false,
   "devDependencies": {
     "@angular-devkit/build-angular": "19.2.3",
-    "@angular/compiler-cli": "^18.0.0",
-    "@angular/cli": "^19.2.6",
+    "@angular/cli": "19.2.22",
+    "@angular/compiler-cli": "19.2.20",
     "ng-packagr": "^19.2.1",
+    "oxfmt": "^0.41.0",
+    "oxlint": "^1.56.0",
+    "oxlint-tsgolint": "^0.17.0",
     "typescript": "~5.4.2"
   },
   "trustedDependencies": [
     "@parcel/watcher"
-  ]
+  ],
+  "exports": {
+    ".": "./src/index.ts"
+  }
 }
