@@ -4,7 +4,7 @@ import {
   ButtonRowComponent,
   MenuComponent,
   MenuOptionComponent,
-} from "komponents";
+} from "@kompakkt/komponents";
 
 @Component({
   selector: "example-menu",

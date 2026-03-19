@@ -3,7 +3,7 @@ import {
   ButtonComponent,
   ButtonRowComponent,
   TooltipDirective,
-} from "komponents";
+} from "@kompakkt/komponents";
 
 @Component({
   selector: "example-tooltip",

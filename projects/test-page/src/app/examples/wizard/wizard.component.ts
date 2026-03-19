@@ -1,5 +1,5 @@
 import { Component } from "@angular/core";
-import { WizardComponent, WizardStepComponent } from "komponents";
+import { WizardComponent, WizardStepComponent } from "@kompakkt/komponents";
 
 @Component({
   selector: "example-wizard",

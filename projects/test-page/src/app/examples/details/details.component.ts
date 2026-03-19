@@ -1,5 +1,5 @@
 import { Component } from "@angular/core";
-import { DetailsComponent } from "komponents";
+import { DetailsComponent } from "@kompakkt/komponents";
 
 @Component({
   selector: "example-details",

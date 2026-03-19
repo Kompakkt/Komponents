@@ -1,5 +1,5 @@
 import { Component } from "@angular/core";
-import { ButtonComponent, ButtonRowComponent } from "komponents";
+import { ButtonComponent, ButtonRowComponent } from "@kompakkt/komponents";
 
 @Component({
   selector: "example-buttons",

@@ -5,10 +5,7 @@
     "types": [],
     "target": "ES2022",
     "useDefineForClassFields": false,
-    "paths": {
-      "komponents": ["../../src"]
-    }
   },
   "files": ["src/main.ts"],
-  "include": ["src/**/*.d.ts"]
+  "include": ["src/**/*.d.ts"],
 }

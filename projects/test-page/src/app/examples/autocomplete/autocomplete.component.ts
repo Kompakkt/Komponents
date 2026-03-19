@@ -3,7 +3,7 @@ import {
   AutocompleteComponent,
   InputComponent,
   MenuOptionComponent,
-} from "komponents";
+} from "@kompakkt/komponents";
 import { FormControl } from "@angular/forms";
 import { map, startWith } from "rxjs";
 import { countryList } from "../../country-list";

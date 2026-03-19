@@ -5,7 +5,7 @@ import {
   SlideToggleComponent,
   SliderComponent,
   TextareaComponent,
-} from "komponents";
+} from "@kompakkt/komponents";
 
 @Component({
   selector: "example-input-elements",
