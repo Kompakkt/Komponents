@@ -22,21 +22,13 @@ jobs:
         run: bun install
 
       - name: Build Project
-        run: bun run build
+        run: bun run --bun build
 
       - name: Get Last Commit Message
         id: last-commit-message
         run: |
           MESSAGE=$(git log -1 --pretty=%B)
           echo "message=$MESSAGE" >> $GITHUB_OUTPUT
-
-      - name: Deploy to dist branch
-        uses: JamesIves/github-pages-deploy-action@v4
-        with:
-          folder: dist/komponents
-          branch: dist
-          commit-message: 'Build output: ${{ steps.last-commit-message.outputs.message }}'
-          clean: true
 
       - name: Deploy to test-page branch
         uses: JamesIves/github-pages-deploy-action@v4

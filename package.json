@@ -2,7 +2,7 @@
   "name": "@kompakkt/komponents",
   "version": "0.0.1",
   "scripts": {
-    "build": "ng build komponents && ng build test-page --base-href './'",
+    "build": "ng build test-page --base-href './'",
     "lint": "oxlint",
     "lint:fix": "oxlint --fix",
     "format": "oxfmt",
