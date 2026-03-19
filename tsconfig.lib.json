@@ -5,7 +5,7 @@
     "strictInjectionParameters": true,
     "strictInputAccessModifiers": true,
     "strictTemplates": true,
-    "trace": true,
+    "trace": true
   },
   "compilerOptions": {
     "lib": ["ESNext", "DOM", "DOM.Iterable"],
@@ -23,8 +23,8 @@
     "skipLibCheck": true,
     "types": [],
     "paths": {
-      "@kompakkt/komponents": ["./src/index.ts"],
-    },
+      "@kompakkt/komponents": ["./src/index.ts"]
+    }
   },
-  "exclude": ["**/*.spec.ts"],
+  "exclude": ["**/*.spec.ts"]
 }

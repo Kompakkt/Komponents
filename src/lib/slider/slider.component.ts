@@ -1,9 +1,8 @@
-import { AsyncPipe } from "@angular/common";
+import { AsyncPipe } from '@angular/common';
 import {
   AfterViewInit,
   Component,
   ElementRef,
-  HostBinding,
   OnDestroy,
   OnInit,
   computed,
@@ -12,8 +11,8 @@ import {
   output,
   signal,
   viewChild,
-} from "@angular/core";
-import { toObservable } from "@angular/core/rxjs-interop";
+} from '@angular/core';
+import { toObservable } from '@angular/core/rxjs-interop';
 import {
   Subscription,
   combineLatest,
@@ -23,18 +22,18 @@ import {
   map,
   merge,
   skip,
-} from "rxjs";
+} from 'rxjs';
 
 @Component({
-  selector: "k-slider",
+  selector: 'k-slider',
   standalone: true,
   imports: [AsyncPipe],
-  templateUrl: "./slider.component.html",
-  styleUrl: "./slider.component.scss",
+  templateUrl: './slider.component.html',
+  styleUrl: './slider.component.scss',
   host: {
-    "[class.show-info]": "showInfo()",
-    "[class.left-to-right]": 'direction() === "left-to-right"',
-    "[class.bottom-to-top]": 'direction() === "bottom-to-top"',
+    '[class.show-info]': 'showInfo()',
+    '[class.left-to-right]': 'direction() === "left-to-right"',
+    '[class.bottom-to-top]': 'direction() === "bottom-to-top"',
   },
 })
 export class SliderComponent implements AfterViewInit, OnInit, OnDestroy {
@@ -47,25 +46,23 @@ export class SliderComponent implements AfterViewInit, OnInit, OnDestroy {
   value = signal(0);
   value$ = toObservable(this.value).pipe(skip(2));
   valueChanged = output<number>();
-  direction = input<"left-to-right" | "bottom-to-top">("left-to-right");
+  direction = input<'left-to-right' | 'bottom-to-top'>('left-to-right');
 
-  startingValueChangedEffect = effect(() =>
-    this.value.set(this.startingValue() ?? ""),
-  );
+  startingValueChangedEffect = effect(() => this.value.set(this.startingValue() ?? ''));
 
   showInfo = input(true);
   showTooltip = input(true);
 
-  railRef = viewChild.required<ElementRef<HTMLElement>>("rail");
-  handleRef = viewChild.required<ElementRef<HTMLElement>>("handle");
+  railRef = viewChild.required<ElementRef<HTMLElement>>('rail');
+  handleRef = viewChild.required<ElementRef<HTMLElement>>('handle');
 
   isDragging$ = merge(
-    fromEvent<MouseEvent>(document, "mousedown").pipe(
-      filter((event) => event.target === this.handleRef().nativeElement),
+    fromEvent<MouseEvent>(document, 'mousedown').pipe(
+      filter(event => event.target === this.handleRef().nativeElement),
     ),
-    fromEvent<MouseEvent>(document, "mouseup"),
+    fromEvent<MouseEvent>(document, 'mouseup'),
   ).pipe(
-    map((event) => event.type === "mousedown"),
+    map(event => event.type === 'mousedown'),
     distinctUntilChanged(),
   );
 
@@ -75,7 +72,7 @@ export class SliderComponent implements AfterViewInit, OnInit, OnDestroy {
 
   valueSubscription?: Subscription;
   ngOnInit(): void {
-    this.valueSubscription = this.value$.subscribe((value) => {
+    this.valueSubscription = this.value$.subscribe(value => {
       this.valueChanged.emit(value);
     });
   }
@@ -85,14 +82,11 @@ export class SliderComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   ngAfterViewInit(): void {
-    combineLatest([
-      fromEvent<MouseEvent>(document, "mousemove"),
-      this.isDragging$,
-    ])
+    combineLatest([fromEvent<MouseEvent>(document, 'mousemove'), this.isDragging$])
       .pipe(filter(([_, isDragging]) => isDragging))
       .subscribe(([event]) => this.#updateValue(event));
-    fromEvent<MouseEvent>(this.railRef().nativeElement, "click").subscribe(
-      (event) => this.#updateValue(event),
+    fromEvent<MouseEvent>(this.railRef().nativeElement, 'click').subscribe(event =>
+      this.#updateValue(event),
     );
   }
 
@@ -103,11 +97,10 @@ export class SliderComponent implements AfterViewInit, OnInit, OnDestroy {
     const handleRect = handleElement.getBoundingClientRect();
 
     const { clickPosition, availableSpace } = (() => {
-      if (this.direction() === "bottom-to-top") {
+      if (this.direction() === 'bottom-to-top') {
         // For vertical slider, use Y coordinates (inverted - bottom is 0, top is max)
         return {
-          clickPosition:
-            railRect.bottom - event.clientY - handleRect.height / 2,
+          clickPosition: railRect.bottom - event.clientY - handleRect.height / 2,
           availableSpace: railRect.height - handleRect.height,
         };
       } else {
@@ -119,11 +112,9 @@ export class SliderComponent implements AfterViewInit, OnInit, OnDestroy {
       }
     })();
 
-    const newValue =
-      this.min() + (clickPosition / availableSpace) * (this.max() - this.min());
+    const newValue = this.min() + (clickPosition / availableSpace) * (this.max() - this.min());
     const steppedValue = Math.round(newValue / this.step()) * this.step();
-    const decimalPlacesOfStep =
-      this.step().toString().split(".").at(1)?.length ?? 0;
+    const decimalPlacesOfStep = this.step().toString().split('.').at(1)?.length ?? 0;
     const roundedValue = parseFloat(steppedValue.toFixed(decimalPlacesOfStep));
     this.value.set(Math.min(Math.max(roundedValue, this.min()), this.max()));
   }

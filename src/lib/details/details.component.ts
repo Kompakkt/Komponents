@@ -1,18 +1,11 @@
-import {
-  AfterViewInit,
-  Component,
-  ElementRef,
-  input,
-  signal,
-  viewChild,
-} from "@angular/core";
-import { interval } from "rxjs";
+import { AfterViewInit, Component, ElementRef, input, signal, viewChild } from '@angular/core';
+import { interval } from 'rxjs';
 
 @Component({
-  selector: "k-details",
+  selector: 'k-details',
   standalone: true,
-  templateUrl: "./details.component.html",
-  styleUrl: "./details.component.scss",
+  templateUrl: './details.component.html',
+  styleUrl: './details.component.scss',
 })
 export class DetailsComponent implements AfterViewInit {
   title = input.required<string>();
@@ -22,8 +15,8 @@ export class DetailsComponent implements AfterViewInit {
 
   gap = input(8);
 
-  contentDiv = viewChild<ElementRef<HTMLDivElement>>("detailsContent");
-  contentHeight = signal("auto");
+  contentDiv = viewChild<ElementRef<HTMLDivElement>>('detailsContent');
+  contentHeight = signal('auto');
 
   toggle() {
     if (!this.alwaysExpanded()) {
@@ -40,11 +33,9 @@ export class DetailsComponent implements AfterViewInit {
         if (!this.expanded()) return;
         const clientHeight = this.contentDiv()?.nativeElement.clientHeight;
         if (!clientHeight) return;
-        const oldHeight = +this.contentHeight()
-          .replace("px", "")
-          .replace("auto", "0");
+        const oldHeight = +this.contentHeight().replace('px', '').replace('auto', '0');
         if (clientHeight <= oldHeight) return;
-        this.contentHeight.set(clientHeight + "px");
+        this.contentHeight.set(clientHeight + 'px');
       });
 
     resize();

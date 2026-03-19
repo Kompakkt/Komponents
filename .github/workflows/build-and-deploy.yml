@@ -13,7 +13,7 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Fetch all history for getting the last commit message
+          fetch-depth: 0 # Fetch all history for getting the last commit message
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
@@ -35,7 +35,7 @@ jobs:
         with:
           folder: dist/komponents
           branch: dist
-          commit-message: "Build output: ${{ steps.last-commit-message.outputs.message }}"
+          commit-message: 'Build output: ${{ steps.last-commit-message.outputs.message }}'
           clean: true
 
       - name: Deploy to test-page branch
@@ -43,5 +43,5 @@ jobs:
         with:
           folder: dist/test-page/browser
           branch: test-page
-          commit-message: "Build output: ${{ steps.last-commit-message.outputs.message }}"
+          commit-message: 'Build output: ${{ steps.last-commit-message.outputs.message }}'
           clean: true
