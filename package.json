@@ -4,6 +4,11 @@
   "scripts": {
     "build": "ng build komponents && ng build test-page --base-href './'"
   },
+  "private": true,
+  "engines": {
+    "bun": ">=1.0.0"
+  },
+  "packageManager": "^bun@1.0.0",
   "peerDependencies": {
     "@angular/common": "19.2.20",
     "@angular/core": "19.2.20",
@@ -14,8 +19,6 @@
   "dependencies": {
     "tslib": "^2.3.0"
   },
-  "sideEffects": false,
-  "private": true,
   "devDependencies": {
     "@angular-devkit/build-angular": "19.2.3",
     "@angular/compiler-cli": "19.2.20",
@@ -27,6 +30,6 @@
     "@parcel/watcher"
   ],
   "exports": {
-    "./": "./src/index.ts"
+    ".": "./src/index.ts"
   }
 }
