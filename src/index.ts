@@ -1,7 +1,3 @@
-/*
- * Public API Surface of komponents
- */
-
 export * from './lib/button-row/button-row.component';
 export * from './lib/button/button.component';
 export * from './lib/details/details.component';
