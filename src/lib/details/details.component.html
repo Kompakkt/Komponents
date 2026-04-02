@@ -16,12 +16,8 @@
   <span>{{ title() }}</span>
 </div>
 
-<div
-  class="details-content"
-  [class.opened]="expanded()"
-  [style.--inner-height]="contentHeight()"
-  [style.--gap.px]="gap()"
-  #detailsContent
->
-  <ng-content />
+<div class="details-content-wrapper" [class.opened]="expanded()">
+  <div class="details-content" [style.--gap.px]="gap()">
+    <ng-content />
+  </div>
 </div>

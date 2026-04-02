@@ -1,31 +1,53 @@
 :host {
   display: flex;
   cursor: default;
-  pointer-events: none;
   flex-direction: column;
-  position: absolute;
-  bottom: 50%;
-  right: 50%;
-  transform: translateX(100%) translateY(calc(100% - 16px));
   background-color: var(--color-gray-dark);
+  color: #fff;
   margin: 0px;
   padding: 0px 8px;
   width: var(--width, 200px);
   border-radius: 4px;
   box-shadow: 0px 0px 4px 2px var(--color-bg-solid);
-  z-index: 1;
   align-items: stretch;
-  filter: opacity(0);
-  transition:
-    transform 200ms ease-out,
-    filter 200ms ease-out;
   text-align: left;
   font-size: var(--font-size-small);
+  border: none;
+  position-area: bottom span-right;
+  position-try-fallbacks:
+    flip-block,
+    flip-inline,
+    flip-block flip-inline;
+  inset: unset;
 
-  &.show {
-    pointer-events: all;
-    filter: opacity(1);
-    transform: translateX(100%) translateY(100%);
+  // Popover API styles
+  &:popover-open {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  // Starting state for popover (closed)
+  --transition-easing: cubic-bezier(0.25, 1, 0.5, 1);
+  --transition-duration: 300ms;
+  opacity: 0;
+  transform: translateY(-8px);
+  transition:
+    opacity var(--transition-duration) var(--transition-easing),
+    transform var(--transition-duration) var(--transition-easing),
+    display var(--transition-duration) var(--transition-easing) allow-discrete,
+    overlay var(--transition-duration) var(--transition-easing) allow-discrete;
+
+  // Transition starting styles
+  @starting-style {
+    &:popover-open {
+      opacity: 0;
+      transform: translateY(-8px);
+    }
+  }
+
+  // Override default popover backdrop
+  &::backdrop {
+    background: transparent;
   }
 }
 

@@ -23,7 +23,8 @@
     "skipLibCheck": true,
     "types": [],
     "paths": {
-      "@kompakkt/komponents": ["./src/index.ts"]
+      "@kompakkt/komponents": ["./src/index.ts"],
+      "src/*": ["./src/*"]
     }
   },
   "exclude": ["**/*.spec.ts"]

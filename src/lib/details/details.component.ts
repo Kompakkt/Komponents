@@ -12,7 +12,6 @@ export class DetailsComponent implements AfterViewInit {
   startCollapsed = input(false);
   alwaysExpanded = input(false);
   expanded = signal(true);
-
   gap = input(8);
 
   contentDiv = viewChild<ElementRef<HTMLDivElement>>('detailsContent');

@@ -7,8 +7,8 @@
   box-shadow: 2px 2px 4px 0px rgba(0, 0, 0, 0.2);
   border-radius: 4px;
 
-  --transition-duration: 0s;
-  --transition-easing: cubic-bezier(0.45, 0, 0.55, 1);
+  --transition-duration: 300ms;
+  --transition-easing: cubic-bezier(0.76, 0, 0.24, 1);
 
   > .details-header {
     min-height: 32px;
@@ -24,24 +24,46 @@
     &:hover {
       background-color: rgba(255, 255, 255, 0.1);
     }
+
+    svg {
+      transition: transform var(--transition-duration) var(--transition-easing);
+      transform: rotate(0deg);
+
+      &.opened {
+        transform: rotate(90deg);
+      }
+    }
+  }
+
+  .details-content-wrapper {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows var(--transition-duration) var(--transition-easing);
+
+    &.opened {
+      grid-template-rows: 1fr;
+    }
   }
 
   .details-content {
     display: flex;
     flex-direction: column;
     align-items: stretch;
-    max-height: 0px;
-    padding: 0px;
-    overflow: hidden;
     gap: var(--gap);
+    overflow: hidden;
 
     transition:
       max-height var(--transition-duration) var(--transition-easing),
       padding var(--transition-duration) var(--transition-easing);
 
-    &.opened {
-      max-height: var(--inner-height, auto);
-      padding: 16px;
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .details-content-wrapper:not(.opened) .details-content {
+    &::before,
+    &::after {
+      height: 0px;
     }
   }
 }

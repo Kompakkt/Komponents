@@ -4,106 +4,124 @@ import {
   ComponentRef,
   Directive,
   ElementRef,
-  HostBinding,
   HostListener,
   ViewContainerRef,
   inject,
   input,
   signal,
+  OnDestroy,
+  OnInit,
 } from '@angular/core';
-import { toObservable } from '@angular/core/rxjs-interop';
-import { filter, fromEvent } from 'rxjs';
 
 type TooltipPosition = 'above' | 'below' | 'left' | 'right';
-type State = {
-  x1: number;
-  x2: number;
-  y1: number;
-  y2: number;
-  text: string;
-  position: TooltipPosition;
-  padding: number;
-};
 
 @Component({
   selector: 'k-tooltip',
-  template: '{{ state()?.text }}',
+  template: '{{ text() }}',
   standalone: true,
   styles: [
     `
       :host {
-        --padding: 8px;
-        position: fixed;
-        text-align: center;
+        margin: 0;
+        padding: 5px 10px;
+        border: none;
         background-color: var(--color-bg-transparent);
         color: #fff;
-        padding: 5px 10px;
         border-radius: 4px;
         font-size: var(--font-size-small);
-        z-index: 1000;
+        text-align: center;
         pointer-events: none;
-        transition-property: opacity;
-        transition-duration: 0.2s;
-        transition-timing-function: ease-in-out;
-        opacity: 0;
+        position: fixed;
+        inset: unset;
 
-        &.visible {
+        /* Popover API animations */
+        opacity: 0;
+        transition:
+          opacity 0.2s ease-in-out,
+          display 0.2s ease-in-out allow-discrete;
+
+        &:popover-open {
           opacity: 1;
+        }
+
+        @starting-style {
+          &:popover-open {
+            opacity: 0;
+          }
         }
       }
     `,
   ],
 })
-export class TooltipComponent implements AfterViewInit {
-  state = input<State>();
-  visible = signal<boolean>(false);
+export class TooltipComponent implements OnInit {
+  text = signal<string>('');
+  position = signal<TooltipPosition>('above');
+  padding = signal<number>(12);
 
   #elRef = inject<ElementRef<HTMLElement>>(ElementRef);
-  #firstStateChange$ = toObservable(this.state).pipe(
-    filter((state): state is State => state !== undefined),
-  );
-  transitionEnd$ = fromEvent(this.#elRef.nativeElement, 'transitionend').pipe(
-    filter(() => !this.visible()),
-  );
+  #anchorElement: HTMLElement | null = null;
+  #popoverId = `tooltip-${Math.random().toString(36).substring(2, 11)}`;
 
-  @HostBinding('class.visible') get isVisible() {
-    return this.visible() && this.state()?.text;
+  ngOnInit(): void {
+    const el = this.#elRef.nativeElement;
+    el.setAttribute('popover', 'manual');
+    el.id = this.#popoverId;
   }
 
-  @HostBinding('style.left.px') get left() {
-    const state = this.state();
-    if (!state) return 0;
-    const { x1, x2, padding, position } = state;
-    const tooltipWidth = this.#elRef.nativeElement.offsetWidth;
-    switch (position) {
-      case 'left':
-        return x1 - tooltipWidth - padding;
-      case 'right':
-        return x2 + padding;
-      default:
-        return x1 + (x2 - x1) / 2 - tooltipWidth / 2;
+  setAnchor(anchor: HTMLElement): void {
+    this.#anchorElement = anchor;
+  }
+
+  show(): void {
+    const el = this.#elRef.nativeElement;
+    if (!this.#anchorElement || !this.text()) return;
+
+    el.showPopover();
+    this.#updatePosition();
+  }
+
+  hide(): void {
+    const el = this.#elRef.nativeElement;
+    try {
+      el.hidePopover();
+    } catch {
+      // Popover might already be hidden
     }
   }
 
-  @HostBinding('style.top.px') get top() {
-    const state = this.state();
-    if (!state) return 0;
-    const { y1, y2, padding, position } = state;
-    const tooltipHeight = this.#elRef.nativeElement.offsetHeight;
-    switch (position) {
+  #updatePosition(): void {
+    if (!this.#anchorElement) return;
+
+    const el = this.#elRef.nativeElement;
+    const anchorRect = this.#anchorElement.getBoundingClientRect();
+    const tooltipRect = el.getBoundingClientRect();
+    const pos = this.position();
+    const pad = this.padding();
+
+    let top: number;
+    let left: number;
+
+    switch (pos) {
       case 'above':
-        return y1 - tooltipHeight - padding;
+        top = anchorRect.top - tooltipRect.height - pad;
+        left = anchorRect.left + (anchorRect.width - tooltipRect.width) / 2;
+        break;
       case 'below':
-        return y2 + padding;
-      default:
-        return y1 + (y2 - y1) / 2 - tooltipHeight / 2;
+        top = anchorRect.bottom + pad;
+        left = anchorRect.left + (anchorRect.width - tooltipRect.width) / 2;
+        break;
+      case 'left':
+        top = anchorRect.top + (anchorRect.height - tooltipRect.height) / 2;
+        left = anchorRect.left - tooltipRect.width - pad;
+        break;
+      case 'right':
+        top = anchorRect.top + (anchorRect.height - tooltipRect.height) / 2;
+        left = anchorRect.right + pad;
+        break;
     }
-  }
 
-  ngAfterViewInit(): void {
-    this.#firstStateChange$.subscribe(() => {
-      this.visible.set(true);
-    });
+    el.style.top = `${top}px`;
+    el.style.left = `${left}px`;
   }
 }
 
@@ -111,39 +129,35 @@ export class TooltipComponent implements AfterViewInit {
   selector: '[tooltip]',
   standalone: true,
 })
-export class TooltipDirective {
+export class TooltipDirective implements AfterViewInit, OnDestroy {
   tooltip = input.required<string>();
   tooltipPosition = input<TooltipPosition>('above');
   tooltipPadding = input(12);
 
-  // #appRef = inject(ApplicationRef);
   #elRef = inject<ElementRef<HTMLElement>>(ElementRef);
   #viewContainerRef = inject(ViewContainerRef);
   #tooltipComponentRef?: ComponentRef<TooltipComponent>;
 
-  constructor() {
-    // Move the tooltip component to the root of the app, so it can be positioned absolutely
-    // const appRoot = this.#appRef.components[0].location.nativeElement as HTMLElement;
+  ngAfterViewInit(): void {
     this.#tooltipComponentRef = this.#viewContainerRef.createComponent(TooltipComponent);
-    // appRoot.append(this.#tooltipComponentRef.location.nativeElement);
+    this.#tooltipComponentRef.instance.setAnchor(this.#elRef.nativeElement);
+  }
+
+  ngOnDestroy(): void {
+    this.#tooltipComponentRef?.destroy();
   }
 
   @HostListener('mouseenter') onMouseEnter() {
-    const { left, top, width, height } = this.#elRef.nativeElement.getBoundingClientRect();
+    if (!this.#tooltipComponentRef) return;
 
-    this.#tooltipComponentRef?.setInput('state', {
-      text: this.tooltip(),
-      position: this.tooltipPosition(),
-      x1: left,
-      x2: left + width,
-      y1: top,
-      y2: top + height,
-      padding: this.tooltipPadding(),
-    } satisfies State);
-    this.#tooltipComponentRef?.instance.visible.set(true);
+    const instance = this.#tooltipComponentRef.instance;
+    instance.text.set(this.tooltip());
+    instance.position.set(this.tooltipPosition());
+    instance.padding.set(this.tooltipPadding());
+    instance.show();
   }
 
   @HostListener('mouseleave') onMouseLeave() {
-    this.#tooltipComponentRef?.instance.visible.set(false);
+    this.#tooltipComponentRef?.instance.hide();
   }
 }
