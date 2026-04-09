@@ -28,7 +28,9 @@ jobs:
         id: last-commit-message
         run: |
           MESSAGE=$(git log -1 --pretty=%B)
-          echo "message=$MESSAGE" >> $GITHUB_OUTPUT
+          echo "message<<EOF" >> $GITHUB_OUTPUT
+          echo "$MESSAGE" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Deploy to test-page branch
         uses: JamesIves/github-pages-deploy-action@v4
