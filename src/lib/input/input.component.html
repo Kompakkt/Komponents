@@ -7,6 +7,7 @@
   <span class="prefix" #prefixEl>{{ prefix() }}</span>
   <input
     [type]="type() === 'number' ? 'text' : type()"
+    [autocomplete]="autocomplete()"
     [value]="value()"
     [placeholder]="placeholder()"
     (input)="onValueChangeEvent($event)"

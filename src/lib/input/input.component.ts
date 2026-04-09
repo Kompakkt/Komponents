@@ -17,6 +17,7 @@ export class InputComponent implements OnInit, OnDestroy {
 
   label = input.required<string>();
   type = input<InputType>('text');
+  autocomplete = input<string>('off');
   placeholder = input('');
 
   startingValue = input<string | number>();
