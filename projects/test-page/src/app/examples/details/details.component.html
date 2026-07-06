@@ -11,3 +11,22 @@
 <k-details title="Details alwaysExpanded=true" [alwaysExpanded]="true">
   <p>Details Content</p>
 </k-details>
+
+<h2>Details — long title (truncated, default)</h2>
+<div style="max-width: 200px">
+  <k-details
+    title="The extremely long title that should truncate with an ellipsis when there is not enough room"
+  >
+    <p>Content</p>
+  </k-details>
+</div>
+
+<h2>Details — long title (marquee on hover)</h2>
+<div style="max-width: 200px">
+  <k-details
+    [marquee]="true"
+    title="The extremely long title that should scroll horizontally when the user hovers over the header"
+  >
+    <p>Content</p>
+  </k-details>
+</div>

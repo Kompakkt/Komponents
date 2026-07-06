@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "scripts": {
     "build": "ng build test-page --base-href './'",
+    "start": "ng serve test-page",
     "lint": "oxlint",
     "lint:fix": "oxlint --fix",
     "format": "oxfmt",
