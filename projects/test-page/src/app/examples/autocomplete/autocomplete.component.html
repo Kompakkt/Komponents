@@ -8,7 +8,7 @@
 />
 
 <k-autocomplete [inputElement]="autocompleteInput" max-height="360">
-  @for (country of filteredCountries | async; track country) {
+  @for (country of filteredCountries | async; track $index) {
     <k-menu-option>{{ country }}</k-menu-option>
   } @empty {
     <p>No results found</p>
