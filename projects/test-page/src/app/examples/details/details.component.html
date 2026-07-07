@@ -30,3 +30,29 @@
     <p>Content</p>
   </k-details>
 </div>
+
+<h2>Details — performance stress test</h2>
+<p>
+  Render many instances to verify that expanding/collapsing stays smooth. With the old
+  <code>interval(100)</code> polling, 200 instances caused ~2000 forced reflows per second.
+</p>
+<div style="display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap">
+  <button (click)="setStressCount(0)">0 instances</button>
+  <button (click)="setStressCount(50)">50 instances</button>
+  <button (click)="setStressCount(100)">100 instances</button>
+  <button (click)="setStressCount(200)">200 instances</button>
+</div>
+<p>
+  Current count: <strong>{{ stressCount() }}</strong>
+</p>
+<div class="stress-container">
+  @for (item of [].constructor(stressCount()); track $index) {
+    <k-details [title]="'Stress item ' + ($index + 1)" [startCollapsed]="$index % 2 === 0">
+      <p>Line 1 of content for item {{ $index + 1 }}</p>
+      @if ($index % 3 === 0) {
+        <p>Extra line for item {{ $index + 1 }}</p>
+        <p>And another line to vary the height</p>
+      }
+    </k-details>
+  }
+</div>

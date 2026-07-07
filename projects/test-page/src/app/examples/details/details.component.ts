@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { DetailsComponent } from '@kompakkt/komponents';
 
 @Component({
@@ -8,4 +8,10 @@ import { DetailsComponent } from '@kompakkt/komponents';
   templateUrl: './details.component.html',
   styleUrl: './details.component.scss',
 })
-export class ExampleDetailsComponent {}
+export class ExampleDetailsComponent {
+  stressCount = signal(0);
+
+  setStressCount(count: number) {
+    this.stressCount.set(count);
+  }
+}

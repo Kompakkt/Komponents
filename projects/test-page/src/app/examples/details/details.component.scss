@@ -1,0 +1,10 @@
+.stress-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 600px;
+  overflow: auto;
+  padding: 8px;
+  border: 1px solid var(--color-gray, #666);
+  border-radius: 4px;
+}
