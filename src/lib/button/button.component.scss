@@ -36,9 +36,12 @@ $transition:
     border: solid 2px var(--color);
   }
 
-  &.disabled::before {
+  &.disabled {
     cursor: not-allowed;
     pointer-events: none;
+  }
+
+  &.disabled::before {
     background-color: rgba(127, 127, 127, 0.5);
   }
 
@@ -86,7 +89,12 @@ $transition:
     border-radius: 50%;
   }
 
-  &:hover::after {
+  &:not(.disabled):hover::after {
     background-color: rgba(255, 255, 255, 0.2);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color);
+    outline-offset: 2px;
   }
 }

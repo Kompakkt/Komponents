@@ -1,4 +1,13 @@
-import { Component, HostBinding, computed, input } from '@angular/core';
+import {
+  booleanAttribute,
+  Component,
+  ElementRef,
+  HostBinding,
+  HostListener,
+  computed,
+  inject,
+  input,
+} from '@angular/core';
 
 const getColor = (color?: ButtonColor) => {
   if (!color) return 'currentColor';
@@ -35,7 +44,7 @@ type ButtonType = `${ButtonStyle}-${ButtonColor}`;
 })
 export class ButtonComponent {
   type = input<ButtonType>('solid-transparent');
-  disabled = input(false);
+  disabled = input(false, { transform: booleanAttribute });
   iconButton = input<string | undefined>(undefined, { alias: 'icon-button' });
   iconSize = input<number | undefined>(undefined, { alias: 'icon-size' });
   fullWidth = input<string | undefined>(undefined, { alias: 'full-width' });
@@ -80,8 +89,32 @@ export class ButtonComponent {
     return this.disabled();
   }
 
+  @HostBinding('attr.role')
+  get role() {
+    return 'button';
+  }
+
+  @HostBinding('attr.tabindex')
+  get tabindex() {
+    return this.disabled() ? -1 : 0;
+  }
+
+  @HostBinding('attr.aria-disabled')
+  get ariaDisabled() {
+    return this.disabled() ? true : null;
+  }
+
+  @HostListener('keydown', ['$event'])
+  onKeydown(event: KeyboardEvent) {
+    if (this.disabled() || (event.key !== 'Enter' && event.key !== ' ')) return;
+    event.preventDefault();
+    this.#hostElement?.click();
+  }
+
   @HostBinding('style.--color')
   get hostColor() {
     return this.#computedColor();
   }
+
+  #hostElement = inject(ElementRef<HTMLElement>).nativeElement;
 }
