@@ -1,4 +1,14 @@
-import { Component, computed, input, OnDestroy, OnInit, output, signal } from '@angular/core';
+import {
+  booleanAttribute,
+  Component,
+  computed,
+  HostBinding,
+  input,
+  OnDestroy,
+  OnInit,
+  output,
+  signal,
+} from '@angular/core';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { skip, Subscription } from 'rxjs';
 
@@ -16,6 +26,7 @@ export class InputComponent implements OnInit, OnDestroy {
   max = input<number>(100);
 
   label = input.required<string>();
+  floatingLabel = input(false, { transform: booleanAttribute });
   type = input<InputType>('text');
   autocomplete = input<string>('off');
   placeholder = input('');
@@ -31,6 +42,11 @@ export class InputComponent implements OnInit, OnDestroy {
 
   #focused = signal(false);
   #focusTimeout: number | undefined;
+
+  @HostBinding('class.floating-label')
+  get isFloatingLabel() {
+    return this.floatingLabel();
+  }
   setFocus(focused: boolean) {
     if (this.#focusTimeout) clearTimeout(this.#focusTimeout);
     this.#focusTimeout = setTimeout(() => {
