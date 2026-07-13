@@ -1,4 +1,4 @@
-import { Component, HostBinding, OnDestroy, OnInit, input, output, signal } from '@angular/core';
+import { Component, HostBinding, OnDestroy, effect, input, output, signal } from '@angular/core';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { Subscription, skip } from 'rxjs';
 
@@ -9,19 +9,17 @@ import { Subscription, skip } from 'rxjs';
   templateUrl: './slide-toggle.component.html',
   styleUrl: './slide-toggle.component.scss',
 })
-export class SlideToggleComponent implements OnInit, OnDestroy {
+export class SlideToggleComponent implements OnDestroy {
   label = input.required<string>();
   startingValue = input<boolean>(false);
   checkedChange = output<boolean>();
-  checked = signal(this.startingValue());
+  checked = signal(false);
+  #sync = effect(() => this.checked.set(this.startingValue()));
   checked$ = toObservable(this.checked).pipe(skip(1));
 
-  valueSubscription?: Subscription;
-  ngOnInit(): void {
-    this.valueSubscription = this.checked$.subscribe(value => {
-      this.checkedChange.emit(value);
-    });
-  }
+  valueSubscription = this.checked$.subscribe(value => {
+    this.checkedChange.emit(value);
+  });
 
   ngOnDestroy(): void {
     this.valueSubscription?.unsubscribe();
