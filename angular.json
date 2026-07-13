@@ -24,10 +24,17 @@
           "defaultConfiguration": "production"
         },
         "test": {
-          "builder": "@angular/build:karma",
+          "builder": "@angular/build:unit-test",
           "options": {
             "tsConfig": "tsconfig.spec.json",
-            "polyfills": ["zone.js", "zone.js/testing"]
+            "setupFiles": ["src/test-setup.ts"],
+            "coverage": true,
+            "coverageThresholds": {
+              "statements": 60,
+              "branches": 60,
+              "functions": 60,
+              "lines": 60
+            }
           }
         }
       }

@@ -1,6 +1,6 @@
 import { Component, input, OnDestroy, OnInit, output, signal } from '@angular/core';
 import { toObservable } from '@angular/core/rxjs-interop';
-import { Subscription } from 'rxjs';
+import { skip, Subscription } from 'rxjs';
 
 @Component({
   selector: 'k-labelled-checkbox',
@@ -15,7 +15,7 @@ export class LabelledCheckboxComponent implements OnInit, OnDestroy {
   #startingValue$ = toObservable(this.startingValue);
   checkedChange = output<boolean>();
   checked = signal(false);
-  checked$ = toObservable(this.checked);
+  checked$ = toObservable(this.checked).pipe(skip(1));
 
   checkedSubscription?: Subscription;
   ngOnInit(): void {

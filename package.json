@@ -7,7 +7,9 @@
     "lint": "oxlint",
     "lint:fix": "oxlint --fix",
     "format": "oxfmt",
-    "format:check": "oxfmt --check"
+    "format:check": "oxfmt --check",
+    "test": "ng test",
+    "test:ci": "ng test --no-watch --no-progress --coverage"
   },
   "private": true,
   "engines": {
@@ -26,11 +28,14 @@
     "@angular/build": "21.2.6",
     "@angular/cli": "21.2.5",
     "@angular/compiler-cli": "21.2.6",
+    "@vitest/coverage-v8": "^4.1.10",
+    "happy-dom": "^20.10.6",
     "ng-packagr": "^21.2.2",
     "oxfmt": "^0.43.0",
     "oxlint": "^1.58.0",
     "oxlint-tsgolint": "^0.19.0",
-    "typescript": "~6.0.2"
+    "typescript": "~6.0.2",
+    "vitest": "^4.1.10"
   },
   "trustedDependencies": [
     "@parcel/watcher"
