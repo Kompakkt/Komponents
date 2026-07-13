@@ -4,6 +4,7 @@
   align-items: stretch;
   gap: 8px;
   margin: 8px 0;
+  min-width: var(--k-select-min-width, 200px);
   font-family: 'Open Sans';
   font-size: var(--font-size-base);
   color: white;
