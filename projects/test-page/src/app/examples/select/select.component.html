@@ -1,0 +1,28 @@
+<h2>Select</h2>
+
+<k-select label="Simple select" placeholder="Choose an option...">
+  <k-menu-option value="1">Option One</k-menu-option>
+  <k-menu-option value="2">Option Two</k-menu-option>
+  <k-menu-option value="3">Option Three</k-menu-option>
+</k-select>
+
+<k-select label="With starting value" startingValue="b">
+  <k-menu-option value="a">Alpha</k-menu-option>
+  <k-menu-option value="b">Bravo</k-menu-option>
+  <k-menu-option value="c">Charlie</k-menu-option>
+</k-select>
+
+<k-select label="Disabled select" disabled>
+  <k-menu-option value="1">Option One</k-menu-option>
+  <k-menu-option value="2">Option Two</k-menu-option>
+</k-select>
+
+<k-select label="Long options" placeholder="Select...">
+  <k-menu-option value="1"
+    >An extremely long option text that should be truncated with ellipsis in the trigger
+    area</k-menu-option
+  >
+  <k-menu-option value="2"
+    >Another long option that demonstrates the same truncation behavior</k-menu-option
+  >
+</k-select>

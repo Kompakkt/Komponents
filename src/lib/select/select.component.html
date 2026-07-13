@@ -1,0 +1,18 @@
+@if (label(); as label) {
+  <span class="label">{{ label }}</span>
+}
+<button class="trigger" type="button" (click)="togglePopover()" [disabled]="disabled()">
+  <span class="trigger-viewport">
+    <span #triggerTextEl class="trigger-text">{{ triggerText() || placeholder() }}</span>
+  </span>
+  <span class="arrow">▼</span>
+</button>
+<div
+  #dropdown
+  class="dropdown"
+  [attr.popover]="'auto'"
+  (toggle)="onPopoverToggle($event)"
+  (click)="onDropdownClick($event)"
+>
+  <ng-content />
+</div>

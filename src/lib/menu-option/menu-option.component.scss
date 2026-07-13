@@ -7,6 +7,9 @@
   margin-right: -8px;
   padding: 0px 8px;
   box-sizing: border-box;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 
   &:not(.disabled) {
     &:hover,
@@ -15,5 +18,11 @@
       cursor: pointer;
       background-color: var(--color-bg-transparent);
     }
+  }
+
+  &.selected::after {
+    content: '✓';
+    margin-left: auto;
+    color: var(--color-primary);
   }
 }

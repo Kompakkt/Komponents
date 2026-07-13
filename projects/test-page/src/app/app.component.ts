@@ -13,6 +13,8 @@ import { ExampleInputElementsComponent } from './examples/input-elements/input-e
 import ExampleInputElementsComponentTemplate from './examples/input-elements/input-elements.component.html';
 import { ExampleWizardComponent } from './examples/wizard/wizard.component';
 import ExampleWizardComponentTemplate from './examples/wizard/wizard.component.html';
+import { ExampleSelectComponent } from './examples/select/select.component';
+import ExampleSelectComponentTemplate from './examples/select/select.component.html';
 
 console.log(ExampleMenuComponentTemplate);
 
@@ -27,6 +29,7 @@ console.log(ExampleMenuComponentTemplate);
     ExampleAutocompleteComponent,
     ExampleInputElementsComponent,
     ExampleWizardComponent,
+    ExampleSelectComponent,
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
@@ -40,5 +43,6 @@ export class AppComponent {
     autocomplete: ExampleAutocompleteComponentTemplate,
     inputElements: ExampleInputElementsComponentTemplate,
     wizard: ExampleWizardComponentTemplate,
+    select: ExampleSelectComponentTemplate,
   };
 }

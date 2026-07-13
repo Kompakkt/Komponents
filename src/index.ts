@@ -12,3 +12,4 @@ export * from './lib/wizard/wizard.component';
 export * from './lib/menu/menu.component';
 export * from './lib/menu-option/menu-option.component';
 export * from './lib/autocomplete/autocomplete.component';
+export * from './lib/select/select.component';
