@@ -85,6 +85,7 @@
     font-size: var(--font-size-small);
     border: none;
     box-sizing: border-box;
+    width: anchor-size(width);
     position-area: bottom span-right;
     position-try-fallbacks:
       flip-block,

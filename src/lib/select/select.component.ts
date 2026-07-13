@@ -113,7 +113,6 @@ export class SelectComponent implements AfterContentInit, OnDestroy {
     const anchorName = `--anchor-${id}`;
     (trigger.style as unknown as Record<string, string>)['anchorName'] = anchorName;
     (dd.style as unknown as Record<string, string>)['positionAnchor'] = anchorName;
-    dd.style.width = `${trigger.offsetWidth}px`;
   }
 
   #syncFromStartingValue(): void {

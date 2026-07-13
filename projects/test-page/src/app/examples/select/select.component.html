@@ -26,3 +26,16 @@
     >Another long option that demonstrates the same truncation behavior</k-menu-option
   >
 </k-select>
+
+<h3>In a flex row (width collapse test)</h3>
+<div class="flex-row">
+  <k-select placeholder="Sequence..." startingValue="1">
+    <k-menu-option value="1">Sequence One</k-menu-option>
+    <k-menu-option value="2">Sequence Two</k-menu-option>
+    <k-menu-option value="3"
+      >A very long sequence name that should not cause the dropdown to collapse</k-menu-option
+    >
+  </k-select>
+  <button type="button">Button</button>
+  <button type="button">Button</button>
+</div>
