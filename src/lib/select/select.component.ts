@@ -32,6 +32,7 @@ export class SelectComponent implements AfterContentInit, OnDestroy {
 
   value = signal<string>('');
   #value$ = toObservable(this.value).pipe(skip(1));
+  #startingValue$ = toObservable(this.startingValue).pipe(skip(1));
   valueChanged = output<string>();
 
   open = signal(false);
@@ -69,7 +70,12 @@ export class SelectComponent implements AfterContentInit, OnDestroy {
     this.#syncFromStartingValue();
     this.#watchOptions();
 
-    this.#subscriptions.push(this.#value$.subscribe(value => this.valueChanged.emit(value)));
+    this.#subscriptions.push(
+      this.#value$.subscribe(value => this.valueChanged.emit(value)),
+      this.#startingValue$.subscribe(value => {
+        if (value !== undefined) this.#applyValue(value);
+      }),
+    );
   }
 
   ngOnDestroy(): void {
@@ -88,10 +94,16 @@ export class SelectComponent implements AfterContentInit, OnDestroy {
   #selectValue(optionValue: string): void {
     const option = this.options.find(o => o.value() === optionValue);
     if (!option || option.disabled()) return;
+    this.#applyValue(optionValue);
+    this.dropdown()?.nativeElement.hidePopover();
+  }
+
+  #applyValue(optionValue: string): void {
+    const option = this.options.find(o => o.value() === optionValue);
+    if (!option || option.disabled()) return;
     this.value.set(optionValue);
     this.triggerText.set(option.elementRef.nativeElement.textContent?.trim() ?? '');
     this.options.forEach(o => (o.selected = o.value() === optionValue));
-    this.dropdown()?.nativeElement.hidePopover();
   }
 
   onDropdownClick(event: Event): void {
@@ -118,7 +130,7 @@ export class SelectComponent implements AfterContentInit, OnDestroy {
   #syncFromStartingValue(): void {
     const sv = this.startingValue();
     if (!sv) return;
-    this.#selectValue(sv);
+    this.#applyValue(sv);
   }
 
   #watchOptions(): void {
