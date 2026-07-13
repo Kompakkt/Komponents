@@ -1,6 +1,4 @@
-import { Component, HostBinding, OnDestroy, effect, input, output, signal } from '@angular/core';
-import { toObservable } from '@angular/core/rxjs-interop';
-import { Subscription, skip } from 'rxjs';
+import { Component, HostBinding, effect, input, output, signal } from '@angular/core';
 
 @Component({
   selector: 'k-slide-toggle',
@@ -9,24 +7,17 @@ import { Subscription, skip } from 'rxjs';
   templateUrl: './slide-toggle.component.html',
   styleUrl: './slide-toggle.component.scss',
 })
-export class SlideToggleComponent implements OnDestroy {
+export class SlideToggleComponent {
   label = input.required<string>();
   startingValue = input<boolean>(false);
   checkedChange = output<boolean>();
   checked = signal(false);
   #sync = effect(() => this.checked.set(this.startingValue()));
-  checked$ = toObservable(this.checked).pipe(skip(1));
-
-  valueSubscription = this.checked$.subscribe(value => {
-    this.checkedChange.emit(value);
-  });
-
-  ngOnDestroy(): void {
-    this.valueSubscription?.unsubscribe();
-  }
 
   toggle() {
-    this.checked.update(value => !value);
+    const next = !this.checked();
+    this.checked.set(next);
+    this.checkedChange.emit(next);
   }
 
   @HostBinding('class.active')
