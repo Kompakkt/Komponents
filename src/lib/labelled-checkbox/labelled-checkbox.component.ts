@@ -1,6 +1,4 @@
-import { Component, input, OnDestroy, OnInit, output, signal } from '@angular/core';
-import { toObservable } from '@angular/core/rxjs-interop';
-import { skip, Subscription } from 'rxjs';
+import { Component, effect, input, output, signal } from '@angular/core';
 
 @Component({
   selector: 'k-labelled-checkbox',
@@ -9,28 +7,19 @@ import { skip, Subscription } from 'rxjs';
   templateUrl: './labelled-checkbox.component.html',
   styleUrl: './labelled-checkbox.component.scss',
 })
-export class LabelledCheckboxComponent implements OnInit, OnDestroy {
+export class LabelledCheckboxComponent {
   label = input.required<string>();
   startingValue = input<boolean>(false);
-  #startingValue$ = toObservable(this.startingValue);
   checkedChange = output<boolean>();
   checked = signal(false);
-  checked$ = toObservable(this.checked).pipe(skip(1));
 
-  checkedSubscription?: Subscription;
-  ngOnInit(): void {
-    this.checkedSubscription = this.checked$.subscribe(value => {
-      this.checkedChange.emit(value);
+  constructor() {
+    effect(() => {
+      this.checkedChange.emit(this.checked());
     });
-
-    this.#startingValue$.subscribe(value => {
-      if (value === this.checked()) return;
-
-      this.checked.set(value);
+    effect(() => {
+      const sv = this.startingValue();
+      if (sv !== this.checked()) this.checked.set(sv);
     });
-  }
-
-  ngOnDestroy(): void {
-    this.checkedSubscription?.unsubscribe();
   }
 }

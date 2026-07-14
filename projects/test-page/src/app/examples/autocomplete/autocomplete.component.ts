@@ -1,6 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { AutocompleteComponent, InputComponent, MenuOptionComponent } from '@kompakkt/komponents';
-import { FormControl } from '@angular/forms';
+import { toObservable } from '@angular/core/rxjs-interop';
 import { map, startWith } from 'rxjs';
 import { countryList } from '../../country-list';
 import { AsyncPipe } from '@angular/common';
@@ -13,8 +13,8 @@ import { AsyncPipe } from '@angular/common';
   styleUrl: './autocomplete.component.scss',
 })
 export class ExampleAutocompleteComponent {
-  searchCountry = new FormControl<string>('', { nonNullable: true });
-  filteredCountries = this.searchCountry.valueChanges.pipe(
+  searchCountry = signal('');
+  filteredCountries = toObservable(this.searchCountry).pipe(
     startWith(''),
     map(v => v.toLowerCase()),
     map(v => countryList.filter(country => country.toLowerCase().includes(v))),

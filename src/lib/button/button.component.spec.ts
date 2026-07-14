@@ -55,7 +55,8 @@ describe('ButtonComponent', () => {
   });
 
   it('should resolve named color to --color-<name> variable', () => {
-    fixture.componentRef.setInput('type', 'solid-primary');
+    fixture.componentRef.setInput('style', 'solid');
+    fixture.componentRef.setInput('color', 'primary');
     fixture.detectChanges();
     expect(fixture.nativeElement.style.getPropertyValue('--color')).toBe(
       'var(--color-primary, currentColor)',
@@ -63,7 +64,8 @@ describe('ButtonComponent', () => {
   });
 
   it('should resolve --color-* custom property token', () => {
-    fixture.componentRef.setInput('type', 'solid--color-primary');
+    fixture.componentRef.setInput('style', 'solid');
+    fixture.componentRef.setInput('color', '--color-primary');
     fixture.detectChanges();
     expect(fixture.nativeElement.style.getPropertyValue('--color')).toBe(
       'var(--color-primary, currentColor)',
@@ -71,19 +73,22 @@ describe('ButtonComponent', () => {
   });
 
   it('should resolve rgb() color literally', () => {
-    fixture.componentRef.setInput('type', 'solid-rgb(0, 0, 0)');
+    fixture.componentRef.setInput('style', 'solid');
+    fixture.componentRef.setInput('color', 'rgb(0, 0, 0)');
     fixture.detectChanges();
     expect(fixture.nativeElement.style.getPropertyValue('--color')).toBe('rgb(0, 0, 0)');
   });
 
   it('should resolve hex color literally', () => {
-    fixture.componentRef.setInput('type', 'outlined-#ff8800');
+    fixture.componentRef.setInput('style', 'outlined');
+    fixture.componentRef.setInput('color', '#ff8800');
     fixture.detectChanges();
     expect(fixture.nativeElement.style.getPropertyValue('--color')).toBe('#ff8800');
   });
 
   it('should fall back to currentColor for unknown color', () => {
-    fixture.componentRef.setInput('type', 'solid-unknown');
+    fixture.componentRef.setInput('style', 'solid');
+    fixture.componentRef.setInput('color', 'unknown');
     fixture.detectChanges();
     expect(fixture.nativeElement.style.getPropertyValue('--color')).toBe(
       'var(--color-unknown, currentColor)',

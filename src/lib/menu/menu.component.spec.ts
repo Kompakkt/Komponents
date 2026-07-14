@@ -109,23 +109,23 @@ describe('MenuComponent interactions', () => {
     expect(getOpen()).toBe(false);
   });
 
-  it('does not hide when mouse leaves parent toward the popover', () => {
+  it('hides when mouse leaves parent toward the popover', () => {
     const { fixture, menuEl, setOpen, getOpen } = setup();
     setOpen(true);
     const ev = new MouseEvent('mouseleave');
     Object.defineProperty(ev, 'relatedTarget', { value: menuEl });
     fixture.nativeElement.querySelector('.anchor').dispatchEvent(ev);
-    expect(getOpen()).toBe(true);
+    expect(getOpen()).toBe(false);
   });
 
-  it('does not hide when mouse leaves popover toward the anchor', () => {
+  it('hides when mouse leaves popover toward the anchor', () => {
     const { fixture, menuEl, setOpen, getOpen } = setup();
     setOpen(true);
     const anchor = fixture.nativeElement.querySelector('.anchor');
     const ev = new MouseEvent('mouseleave');
     Object.defineProperty(ev, 'relatedTarget', { value: anchor });
     menuEl.dispatchEvent(ev);
-    expect(getOpen()).toBe(true);
+    expect(getOpen()).toBe(false);
   });
 
   it('hides when mouse leaves popover to outside', () => {

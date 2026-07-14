@@ -1,102 +1,79 @@
 import {
-  AfterViewInit,
-  Component,
-  ComponentRef,
   Directive,
   ElementRef,
   HostListener,
-  ViewContainerRef,
   inject,
   input,
-  signal,
   OnDestroy,
-  OnInit,
+  AfterViewInit,
 } from '@angular/core';
 
 type TooltipPosition = 'above' | 'below' | 'left' | 'right';
 
-@Component({
-  selector: 'k-tooltip',
-  template: '{{ text() }}',
+@Directive({
+  selector: '[tooltip]',
   standalone: true,
-  styles: [
-    `
-      :host {
-        margin: 0;
-        padding: 5px 10px;
-        border: none;
-        background-color: var(--color-bg-transparent);
-        color: #fff;
-        border-radius: 4px;
-        font-size: var(--font-size-small);
-        text-align: center;
-        pointer-events: none;
-        position: fixed;
-        inset: unset;
-
-        /* Popover API animations */
-        opacity: 0;
-        transition:
-          opacity 0.2s ease-in-out,
-          display 0.2s ease-in-out allow-discrete;
-
-        &:popover-open {
-          opacity: 1;
-        }
-
-        @starting-style {
-          &:popover-open {
-            opacity: 0;
-          }
-        }
-      }
-    `,
-  ],
 })
-export class TooltipComponent implements OnInit {
-  text = signal<string>('');
-  position = signal<TooltipPosition>('above');
-  padding = signal<number>(12);
+export class TooltipDirective implements AfterViewInit, OnDestroy {
+  tooltip = input.required<string>();
+  tooltipPosition = input<TooltipPosition>('above');
+  tooltipPadding = input(12);
 
   #elRef = inject<ElementRef<HTMLElement>>(ElementRef);
-  #anchorElement: HTMLElement | null = null;
-  #popoverId = `tooltip-${Math.random().toString(36).substring(2, 11)}`;
+  #tooltipEl?: HTMLElement;
 
-  ngOnInit(): void {
-    const el = this.#elRef.nativeElement;
-    el.setAttribute('popover', 'manual');
-    el.id = this.#popoverId;
+  ngAfterViewInit(): void {
+    const tip = document.createElement('div');
+    tip.textContent = this.tooltip();
+    tip.setAttribute('popover', 'manual');
+    tip.id = `tooltip-${crypto.randomUUID()}`;
+    tip.className = 'k-tooltip-popover';
+    tip.style.cssText = `
+      margin: 0;
+      padding: 5px 10px;
+      border: none;
+      background-color: var(--color-bg-transparent);
+      color: #fff;
+      border-radius: 4px;
+      font-size: var(--font-size-small);
+      text-align: center;
+      pointer-events: none;
+      position: fixed;
+      inset: unset;
+      opacity: 0;
+      transition: opacity 0.2s ease-in-out, display 0.2s ease-in-out allow-discrete;
+    `;
+    document.body.appendChild(tip);
+    this.#tooltipEl = tip;
   }
 
-  setAnchor(anchor: HTMLElement): void {
-    this.#anchorElement = anchor;
-  }
-
+  @HostListener('mouseenter')
   show(): void {
-    const el = this.#elRef.nativeElement;
-    if (!this.#anchorElement || !this.text()) return;
-
-    el.showPopover();
+    const tip = this.#tooltipEl;
+    if (!tip || !this.tooltip()) return;
+    tip.textContent = this.tooltip();
+    tip.style.opacity = '1';
+    tip.showPopover();
     this.#updatePosition();
   }
 
+  @HostListener('mouseleave')
   hide(): void {
-    const el = this.#elRef.nativeElement;
-    try {
-      el.hidePopover();
-    } catch {
-      // Popover might already be hidden
-    }
+    const tip = this.#tooltipEl;
+    if (!tip) return;
+    tip.style.opacity = '0';
+    tip.hidePopover();
   }
 
   #updatePosition(): void {
-    if (!this.#anchorElement) return;
+    const tip = this.#tooltipEl;
+    const anchor = this.#elRef.nativeElement;
+    if (!tip || !anchor) return;
 
-    const el = this.#elRef.nativeElement;
-    const anchorRect = this.#anchorElement.getBoundingClientRect();
-    const tooltipRect = el.getBoundingClientRect();
-    const pos = this.position();
-    const pad = this.padding();
+    const anchorRect = anchor.getBoundingClientRect();
+    const tooltipRect = tip.getBoundingClientRect();
+    const pos = this.tooltipPosition();
+    const pad = this.tooltipPadding();
 
     let top: number;
     let left: number;
@@ -120,44 +97,11 @@ export class TooltipComponent implements OnInit {
         break;
     }
 
-    el.style.top = `${top}px`;
-    el.style.left = `${left}px`;
-  }
-}
-
-@Directive({
-  selector: '[tooltip]',
-  standalone: true,
-})
-export class TooltipDirective implements AfterViewInit, OnDestroy {
-  tooltip = input.required<string>();
-  tooltipPosition = input<TooltipPosition>('above');
-  tooltipPadding = input(12);
-
-  #elRef = inject<ElementRef<HTMLElement>>(ElementRef);
-  #viewContainerRef = inject(ViewContainerRef);
-  #tooltipComponentRef?: ComponentRef<TooltipComponent>;
-
-  ngAfterViewInit(): void {
-    this.#tooltipComponentRef = this.#viewContainerRef.createComponent(TooltipComponent);
-    this.#tooltipComponentRef.instance.setAnchor(this.#elRef.nativeElement);
+    tip.style.top = `${top}px`;
+    tip.style.left = `${left}px`;
   }
 
   ngOnDestroy(): void {
-    this.#tooltipComponentRef?.destroy();
-  }
-
-  @HostListener('mouseenter') onMouseEnter() {
-    if (!this.#tooltipComponentRef) return;
-
-    const instance = this.#tooltipComponentRef.instance;
-    instance.text.set(this.tooltip());
-    instance.position.set(this.tooltipPosition());
-    instance.padding.set(this.tooltipPadding());
-    instance.show();
-  }
-
-  @HostListener('mouseleave') onMouseLeave() {
-    this.#tooltipComponentRef?.instance.hide();
+    this.#tooltipEl?.remove();
   }
 }

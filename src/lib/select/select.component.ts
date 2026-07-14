@@ -13,9 +13,9 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
-import { toObservable } from '@angular/core/rxjs-interop';
-import { skip, Subscription } from 'rxjs';
+
 import { MenuOptionComponent } from '../menu-option/menu-option.component';
+import { setupMarquee } from '../shared/marquee';
 
 @Component({
   selector: 'k-select',
@@ -31,8 +31,6 @@ export class SelectComponent implements AfterContentInit, OnDestroy {
   startingValue = input<string>();
 
   value = signal<string>('');
-  #value$ = toObservable(this.value).pipe(skip(1));
-  #startingValue$ = toObservable(this.startingValue).pipe(skip(1));
   valueChanged = output<string>();
 
   open = signal(false);
@@ -44,24 +42,21 @@ export class SelectComponent implements AfterContentInit, OnDestroy {
   triggerTextEl = viewChild<ElementRef<HTMLElement>>('triggerTextEl');
 
   #elementRef = inject<ElementRef<HTMLElement>>(ElementRef);
-  #subscriptions = new Array<Subscription>();
+  #optionsSub?: { unsubscribe(): void };
 
   constructor() {
+    effect(() => {
+      this.valueChanged.emit(this.value());
+    });
+    effect(() => {
+      const sv = this.startingValue();
+      if (sv !== undefined) this.#applyValue(sv);
+    });
     effect(onCleanup => {
       void this.triggerText();
       const span = this.triggerTextEl()?.nativeElement;
       if (!span) return;
-      const update = () => {
-        const viewport = span.parentElement;
-        if (!viewport) return;
-        const distance = Math.max(span.scrollWidth - viewport.clientWidth, 0);
-        span.style.setProperty('--marquee-distance', `${distance}px`);
-        span.style.setProperty('--marquee-duration', `${distance * 0.02 + 1}s`);
-      };
-      update();
-      const ro = new ResizeObserver(update);
-      ro.observe(span.parentElement ?? span);
-      onCleanup(() => ro.disconnect());
+      onCleanup(setupMarquee(span));
     });
   }
 
@@ -69,17 +64,10 @@ export class SelectComponent implements AfterContentInit, OnDestroy {
     this.#setupAnchor();
     this.#syncFromStartingValue();
     this.#watchOptions();
-
-    this.#subscriptions.push(
-      this.#value$.subscribe(value => this.valueChanged.emit(value)),
-      this.#startingValue$.subscribe(value => {
-        if (value !== undefined) this.#applyValue(value);
-      }),
-    );
   }
 
   ngOnDestroy(): void {
-    this.#subscriptions.forEach(s => s.unsubscribe());
+    this.#optionsSub?.unsubscribe();
   }
 
   togglePopover(): void {
@@ -99,6 +87,7 @@ export class SelectComponent implements AfterContentInit, OnDestroy {
   }
 
   #applyValue(optionValue: string): void {
+    if (!this.options?.length) return;
     const option = this.options.find(o => o.value() === optionValue);
     if (!option || option.isDisabled) return;
     this.value.set(optionValue);
@@ -134,7 +123,7 @@ export class SelectComponent implements AfterContentInit, OnDestroy {
   }
 
   #watchOptions(): void {
-    this.options.changes.subscribe(() => {
+    this.#optionsSub = this.options.changes.subscribe(() => {
       this.#syncFromStartingValue();
     });
   }

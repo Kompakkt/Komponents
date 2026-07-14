@@ -1,33 +1,21 @@
-import { AsyncPipe } from '@angular/common';
 import {
   AfterViewInit,
   Component,
+  DestroyRef,
   ElementRef,
-  OnDestroy,
-  OnInit,
   computed,
   effect,
+  inject,
   input,
   output,
   signal,
   viewChild,
 } from '@angular/core';
-import { toObservable } from '@angular/core/rxjs-interop';
-import {
-  Subscription,
-  combineLatest,
-  distinctUntilChanged,
-  filter,
-  fromEvent,
-  map,
-  merge,
-  skip,
-} from 'rxjs';
 
 @Component({
   selector: 'k-slider',
   standalone: true,
-  imports: [AsyncPipe],
+  imports: [],
   templateUrl: './slider.component.html',
   styleUrl: './slider.component.scss',
   host: {
@@ -36,7 +24,7 @@ import {
     '[class.bottom-to-top]': 'direction() === "bottom-to-top"',
   },
 })
-export class SliderComponent implements AfterViewInit, OnInit, OnDestroy {
+export class SliderComponent implements AfterViewInit {
   label = input.required<string>();
   min = input(0);
   max = input(100);
@@ -44,7 +32,6 @@ export class SliderComponent implements AfterViewInit, OnInit, OnDestroy {
   showLabel = input(true);
   step = input(0.1);
   value = signal(0);
-  value$ = toObservable(this.value).pipe(skip(2));
   valueChanged = output<number>();
   direction = input<'left-to-right' | 'bottom-to-top'>('left-to-right');
 
@@ -56,38 +43,44 @@ export class SliderComponent implements AfterViewInit, OnInit, OnDestroy {
   railRef = viewChild.required<ElementRef<HTMLElement>>('rail');
   handleRef = viewChild.required<ElementRef<HTMLElement>>('handle');
 
-  isDragging$ = merge(
-    fromEvent<MouseEvent>(document, 'mousedown').pipe(
-      filter(event => event.target === this.handleRef().nativeElement),
-    ),
-    fromEvent<MouseEvent>(document, 'mouseup'),
-  ).pipe(
-    map(event => event.type === 'mousedown'),
-    distinctUntilChanged(),
-  );
+  isDragging = false;
 
   handlePosition = computed(() => {
     return ((this.value() - this.min()) / (this.max() - this.min())) * 100;
   });
 
-  valueSubscription?: Subscription;
-  ngOnInit(): void {
-    this.valueSubscription = this.value$.subscribe(value => {
-      this.valueChanged.emit(value);
+  constructor() {
+    effect(() => {
+      this.valueChanged.emit(this.value());
     });
   }
 
-  ngOnDestroy(): void {
-    this.valueSubscription?.unsubscribe();
-  }
+  #destroyRef = inject(DestroyRef);
 
   ngAfterViewInit(): void {
-    combineLatest([fromEvent<MouseEvent>(document, 'mousemove'), this.isDragging$])
-      .pipe(filter(([_, isDragging]) => isDragging))
-      .subscribe(([event]) => this.#updateValue(event));
-    fromEvent<MouseEvent>(this.railRef().nativeElement, 'click').subscribe(event =>
-      this.#updateValue(event),
-    );
+    const rail = this.railRef().nativeElement;
+    const handle = this.handleRef().nativeElement;
+
+    const onMouseDown = (e: MouseEvent) => {
+      if (e.target === handle) this.isDragging = true;
+    };
+    const onMouseUp = () => { this.isDragging = false; };
+    const onMouseMove = (e: MouseEvent) => {
+      if (this.isDragging) this.#updateValue(e);
+    };
+    const onRailClick = (e: MouseEvent) => this.#updateValue(e);
+
+    document.addEventListener('mousedown', onMouseDown);
+    document.addEventListener('mouseup', onMouseUp);
+    document.addEventListener('mousemove', onMouseMove);
+    rail.addEventListener('click', onRailClick);
+
+    this.#destroyRef.onDestroy(() => {
+      document.removeEventListener('mousedown', onMouseDown);
+      document.removeEventListener('mouseup', onMouseUp);
+      document.removeEventListener('mousemove', onMouseMove);
+      rail.removeEventListener('click', onRailClick);
+    });
   }
 
   #updateValue(event: MouseEvent) {

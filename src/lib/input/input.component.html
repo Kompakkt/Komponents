@@ -6,14 +6,16 @@
 >
   <span class="prefix" #prefixEl>{{ prefix() }}</span>
   <input
-    [type]="type() === 'number' ? 'text' : type()"
+    [type]="type()"
+    [min]="type() === 'number' ? min() : null"
+    [max]="type() === 'number' ? max() : null"
     [autocomplete]="autocomplete()"
     [value]="value()"
     [placeholder]="placeholder()"
     (input)="onValueChangeEvent($event)"
     (change)="onValueChangeEvent($event)"
-    (focus)="setFocus(true)"
-    (blur)="setFocus(false)"
+    (focus)="focused.set(true)"
+    (blur)="focused.set(false)"
   />
   <span class="suffix" #suffixEl>{{ suffix() }} </span>
 </div>

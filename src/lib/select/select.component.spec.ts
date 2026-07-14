@@ -70,12 +70,12 @@ describe('SelectComponent', () => {
     expect(component.open()).toBe(false);
   });
 
-  it('should not emit valueChanged during initialization', () => {
+  it('should emit initial value on initialization (effect-driven)', () => {
     const f = TestBed.createComponent(SelectComponent);
     const values: string[] = [];
     f.componentInstance.valueChanged.subscribe(v => values.push(v));
     f.detectChanges();
-    expect(values).toEqual([]);
+    expect(values).toEqual(['']);
   });
 
   it('should handle disabled="" attribute via booleanAttribute', async () => {

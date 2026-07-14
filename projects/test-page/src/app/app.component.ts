@@ -16,8 +16,6 @@ import ExampleWizardComponentTemplate from './examples/wizard/wizard.component.h
 import { ExampleSelectComponent } from './examples/select/select.component';
 import ExampleSelectComponentTemplate from './examples/select/select.component.html';
 
-console.log(ExampleMenuComponentTemplate);
-
 @Component({
   selector: 'app-root',
   standalone: true,

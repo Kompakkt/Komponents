@@ -5,7 +5,6 @@
     "strictInjectionParameters": true,
     "strictInputAccessModifiers": true,
     "strictTemplates": true,
-    "trace": true
   },
   "compilerOptions": {
     "lib": ["ESNext", "DOM", "DOM.Iterable"],

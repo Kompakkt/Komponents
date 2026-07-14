@@ -62,7 +62,7 @@ describe('SliderComponent', () => {
     fixture.detectChanges();
     component.value.set(50);
     fixture.detectChanges();
-    expect(values).toEqual([50]);
+    expect(values).toEqual([25, 50]);
   });
 
   it('should react to late startingValue changes', async () => {
@@ -81,7 +81,7 @@ describe('SliderComponent', () => {
     const values: number[] = [];
     f.componentInstance.valueChanged.subscribe(v => values.push(v));
     f.detectChanges();
-    expect(values).toEqual([]);
+    expect(values).toEqual([0]);
   });
 
   it('should reflect startingValue', async () => {

@@ -8,8 +8,6 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
-import { toObservable } from '@angular/core/rxjs-interop';
-import { skip, Subscription } from 'rxjs';
 
 @Component({
   selector: 'k-textarea',
@@ -26,7 +24,6 @@ export class TextareaComponent {
 
   startingValue = input<string>();
   value = signal('');
-  value$ = toObservable(this.value).pipe(skip(2));
   valueChanged = output<{ value: string }>();
 
   prefix = input('');
@@ -38,23 +35,18 @@ export class TextareaComponent {
     alias: 'resize',
   });
 
-  startingValueChangedEffect = effect(() => this.#updateValue(this.startingValue() ?? ''));
-
-  #updateValue(value: string) {
-    this.value.set(value.toString());
-  }
-
-  valueSubscription?: Subscription;
-  ngOnInit(): void {
-    this.valueSubscription = this.value$.subscribe(value => {
-      this.valueChanged.emit({
-        value,
-      });
+  constructor() {
+    effect(() => {
+      this.valueChanged.emit({ value: this.value() });
+    });
+    effect(() => {
+      const sv = this.startingValue();
+      if (sv !== undefined) this.#updateValue(sv);
     });
   }
 
-  ngOnDestroy(): void {
-    this.valueSubscription?.unsubscribe();
+  #updateValue(value: string) {
+    this.value.set(value.toString());
   }
 
   onValueChangeEvent(event: Event) {

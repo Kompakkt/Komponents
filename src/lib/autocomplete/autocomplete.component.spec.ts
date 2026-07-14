@@ -60,10 +60,9 @@ describe('AutocompleteComponent', () => {
     expect(fixture.nativeElement.style.getPropertyValue('--max-height')).toBe('300px');
   });
 
-  it('opened should track the bound input focus state', async () => {
+  it('opened should track the bound input focus state', () => {
     const fixture = TestBed.createComponent(TestHostComponent);
     fixture.detectChanges();
-    await fixture.whenStable();
 
     const autocomplete: AutocompleteComponent = fixture.debugElement.query(
       By.directive(AutocompleteComponent),
@@ -73,15 +72,11 @@ describe('AutocompleteComponent', () => {
     ).componentInstance;
 
     expect(autocomplete.opened()).toBe(false);
-    input.setFocus(true);
-    fixture.detectChanges();
-    await new Promise(r => setTimeout(r, 110));
+    input.focused.set(true);
     fixture.detectChanges();
     expect(autocomplete.opened()).toBe(true);
 
-    input.setFocus(false);
-    fixture.detectChanges();
-    await new Promise(r => setTimeout(r, 110));
+    input.focused.set(false);
     fixture.detectChanges();
     expect(autocomplete.opened()).toBe(false);
   });

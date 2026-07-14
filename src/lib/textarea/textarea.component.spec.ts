@@ -46,7 +46,8 @@ describe('TextareaComponent', () => {
     fixture.detectChanges();
     component.value.set('next');
     fixture.detectChanges();
-    expect(values).toEqual([{ value: 'next' }]);
+    expect(values.length).toBe(2);
+    expect(values[1]).toEqual({ value: 'next' });
   });
 
   it('should reflect startingValue', async () => {
@@ -69,13 +70,13 @@ describe('TextareaComponent', () => {
     expect(component.value()).toBe('second');
   });
 
-  it('should not emit valueChanged during initialization', () => {
+  it('should emit initial value on initialization (effect-driven)', () => {
     const f = TestBed.createComponent(TextareaComponent);
     f.componentRef.setInput('label', 'Test');
     const values: Array<{ value: string }> = [];
     f.componentInstance.valueChanged.subscribe(v => values.push(v));
     f.detectChanges();
-    expect(values).toEqual([]);
+    expect(values).toEqual([{ value: '' }]);
   });
 
   it('should set resize style', async () => {

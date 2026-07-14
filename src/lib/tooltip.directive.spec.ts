@@ -1,6 +1,6 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
 import { Component } from '@angular/core';
-import { TooltipDirective, TooltipComponent } from './tooltip.directive';
+import { TooltipDirective } from './tooltip.directive';
 
 type Pos = 'above' | 'below' | 'left' | 'right';
 
@@ -28,6 +28,7 @@ function setup(overrides: Partial<TestHostComponent> = {}) {
 function cleanup() {
   delete (HTMLElement.prototype as any).showPopover;
   delete (HTMLElement.prototype as any).hidePopover;
+  document.querySelectorAll('.k-tooltip-popover').forEach(el => el.remove());
 }
 
 describe('TooltipDirective', () => {
@@ -37,7 +38,7 @@ describe('TooltipDirective', () => {
     const fixture = setup();
     fixture.nativeElement.querySelector('button').dispatchEvent(new Event('mouseenter'));
     fixture.detectChanges();
-    const tooltip = fixture.nativeElement.querySelector('k-tooltip');
+    const tooltip = document.querySelector<HTMLElement>('.k-tooltip-popover');
     expect(tooltip?.textContent).toContain('Help text');
   });
 
@@ -68,7 +69,7 @@ describe('TooltipDirective', () => {
     const fixture = setup({ pos });
     fixture.nativeElement.querySelector('button').dispatchEvent(new Event('mouseenter'));
     fixture.detectChanges();
-    const tooltip = fixture.nativeElement.querySelector('k-tooltip');
+    const tooltip = document.querySelector<HTMLElement>('.k-tooltip-popover')!;
     expect(tooltip.style.top).toBe(top);
     expect(tooltip.style.left).toBe(left);
   });
