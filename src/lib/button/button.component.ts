@@ -33,6 +33,7 @@ type ButtonColor =
   | `--color-${string}`
   | `rgb${string}`
   | `#${string}`;
+type ButtonType = `${ButtonStyle}-${ButtonColor}`;
 
 @Component({
   selector: 'k-button',
@@ -41,15 +42,21 @@ type ButtonColor =
   styleUrl: './button.component.scss',
 })
 export class ButtonComponent {
-  style = input<ButtonStyle>('solid');
-  color = input<ButtonColor>('transparent');
+  type = input<ButtonType>('solid-transparent');
   disabled = input(false, { transform: booleanAttribute });
   iconButton = input<string | undefined>(undefined, { alias: 'icon-button' });
   iconSize = input<number | undefined>(undefined, { alias: 'icon-size' });
   fullWidth = input<string | undefined>(undefined, { alias: 'full-width' });
 
-  #computedStyle = computed(() => this.style());
-  #computedColor = computed(() => getColor(this.color()));
+  #splitType = computed(() => {
+    const type = this.type();
+    const style = (type.startsWith('outlined') ? 'outlined' : 'solid') as ButtonStyle;
+    const rest = type.slice(style.length);
+    const color = (rest.startsWith('--') ? rest : rest.slice(1)) as ButtonColor;
+    return [style, color] as const;
+  });
+  #computedStyle = computed(() => this.#splitType()[0]);
+  #computedColor = computed(() => getColor(this.#splitType()[1]));
 
   @HostBinding('class.icon-button')
   get isIconButton() {
