@@ -51,9 +51,9 @@ export class ButtonComponent {
 
   #splitType = computed(() => {
     const type = this.type();
-    const firstDashIndex = type.indexOf('-');
-    const style = type.slice(0, firstDashIndex) as ButtonStyle;
-    const color = type.slice(firstDashIndex + 1) as ButtonColor;
+    const style = (type.startsWith('outlined') ? 'outlined' : 'solid') as ButtonStyle;
+    const rest = type.slice(style.length);
+    const color = (rest.startsWith('--') ? rest : rest.slice(1)) as ButtonColor;
     return [style, color] as const;
   });
   #computedStyle = computed(() => this.#splitType().at(0) as ButtonStyle);

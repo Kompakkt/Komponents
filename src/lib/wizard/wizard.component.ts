@@ -28,7 +28,8 @@ export class WizardComponent implements AfterViewInit {
   #stepIndex = signal(0);
   stepIndex = computed(() => {
     const index = this.#stepIndex();
-    return this.steps().length % index;
+    const length = this.steps().length;
+    return length ? index % length : 0;
   });
   selectedStep = computed(() => {
     const index = this.#stepIndex();
@@ -55,7 +56,6 @@ export class WizardComponent implements AfterViewInit {
     nextStep.active.set(true);
     const el = this.horizontalContentContainer();
     if (el) {
-      console.log(el.nativeElement, nextStep.contentDiv());
       el.nativeElement.innerHTML = nextStep.contentDiv()?.nativeElement.innerHTML ?? '';
     }
 

@@ -15,6 +15,10 @@ export class MenuOptionComponent {
   elementRef = inject<ElementRef<HTMLElement>>(ElementRef);
 
   @HostBinding('class.disabled') get disabledClass() {
+    return this.isDisabled;
+  }
+
+  get isDisabled() {
     return typeof this.disabled() === 'string';
   }
 

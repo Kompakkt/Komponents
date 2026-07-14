@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { vi } from 'vitest';
 import { InputComponent } from './input.component';
 
 describe('InputComponent', () => {
@@ -123,5 +124,76 @@ describe('InputComponent', () => {
     const suffixEl = fixture.nativeElement.querySelector('.suffix');
     expect(prefixEl.textContent).toContain('$');
     expect(suffixEl.textContent).toContain('.00');
+  });
+
+  it('should clamp number input to max', async () => {
+    fixture = TestBed.createComponent(InputComponent);
+    component = fixture.componentInstance;
+    fixture.componentRef.setInput('label', 'Qty');
+    fixture.componentRef.setInput('type', 'number');
+    fixture.componentRef.setInput('min', 0);
+    fixture.componentRef.setInput('max', 100);
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    const input = fixture.nativeElement.querySelector('input');
+    input.value = '500';
+    input.dispatchEvent(new Event('input'));
+    fixture.detectChanges();
+
+    expect(component.value()).toBe('100');
+  });
+
+  it('should clamp number input to min', async () => {
+    fixture = TestBed.createComponent(InputComponent);
+    component = fixture.componentInstance;
+    fixture.componentRef.setInput('label', 'Qty');
+    fixture.componentRef.setInput('type', 'number');
+    fixture.componentRef.setInput('min', 10);
+    fixture.componentRef.setInput('max', 100);
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    const input = fixture.nativeElement.querySelector('input');
+    input.value = '-5';
+    input.dispatchEvent(new Event('input'));
+    fixture.detectChanges();
+
+    expect(component.value()).toBe('10');
+  });
+
+  it('should strip non-numeric characters for number type', async () => {
+    fixture = TestBed.createComponent(InputComponent);
+    component = fixture.componentInstance;
+    fixture.componentRef.setInput('label', 'Qty');
+    fixture.componentRef.setInput('type', 'number');
+    fixture.componentRef.setInput('max', 1000);
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    const input = fixture.nativeElement.querySelector('input');
+    input.value = '12a3.5';
+    input.dispatchEvent(new Event('input'));
+    fixture.detectChanges();
+
+    expect(component.value()).toBe('123.5');
+  });
+
+  it('should set focused after the debounce timeout', () => {
+    vi.useFakeTimers();
+    component.setFocus(true);
+    expect(component.focused()).toBe(false);
+    vi.advanceTimersByTime(100);
+    expect(component.focused()).toBe(true);
+    vi.useRealTimers();
+  });
+
+  it('should clear a pending focus timer on re-entry', () => {
+    vi.useFakeTimers();
+    component.setFocus(true);
+    component.setFocus(false);
+    vi.advanceTimersByTime(100);
+    expect(component.focused()).toBe(false);
+    vi.useRealTimers();
   });
 });

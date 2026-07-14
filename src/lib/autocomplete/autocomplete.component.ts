@@ -13,7 +13,8 @@ export class AutocompleteComponent {
 
   @HostBinding('style.--max-height')
   get maxHeightStyle() {
-    return `${this.maxHeight()}px`;
+    const v = this.maxHeight();
+    return typeof v === 'number' ? `${v}px` : v;
   }
 
   inputElement = input.required<InputComponent>();

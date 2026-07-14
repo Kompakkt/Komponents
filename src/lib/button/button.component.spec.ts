@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { vi } from 'vitest';
 import { ButtonComponent } from './button.component';
 
 describe('ButtonComponent', () => {
@@ -51,5 +52,76 @@ describe('ButtonComponent', () => {
     const text = 'Click me';
     fixture.nativeElement.textContent = text;
     expect(fixture.nativeElement.textContent).toContain(text);
+  });
+
+  it('should resolve named color to --color-<name> variable', () => {
+    fixture.componentRef.setInput('type', 'solid-primary');
+    fixture.detectChanges();
+    expect(fixture.nativeElement.style.getPropertyValue('--color')).toBe(
+      'var(--color-primary, currentColor)',
+    );
+  });
+
+  it('should resolve --color-* custom property token', () => {
+    fixture.componentRef.setInput('type', 'solid--color-primary');
+    fixture.detectChanges();
+    expect(fixture.nativeElement.style.getPropertyValue('--color')).toBe(
+      'var(--color-primary, currentColor)',
+    );
+  });
+
+  it('should resolve rgb() color literally', () => {
+    fixture.componentRef.setInput('type', 'solid-rgb(0, 0, 0)');
+    fixture.detectChanges();
+    expect(fixture.nativeElement.style.getPropertyValue('--color')).toBe('rgb(0, 0, 0)');
+  });
+
+  it('should resolve hex color literally', () => {
+    fixture.componentRef.setInput('type', 'outlined-#ff8800');
+    fixture.detectChanges();
+    expect(fixture.nativeElement.style.getPropertyValue('--color')).toBe('#ff8800');
+  });
+
+  it('should fall back to currentColor for unknown color', () => {
+    fixture.componentRef.setInput('type', 'solid-unknown');
+    fixture.detectChanges();
+    expect(fixture.nativeElement.style.getPropertyValue('--color')).toBe(
+      'var(--color-unknown, currentColor)',
+    );
+  });
+
+  it('should click host on Enter', () => {
+    const el = fixture.nativeElement as HTMLElement;
+    const clickSpy = vi.spyOn(el, 'click').mockImplementation(() => {});
+    el.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter' }));
+    expect(clickSpy).toHaveBeenCalled();
+    clickSpy.mockRestore();
+  });
+
+  it('should click host on Space', () => {
+    const el = fixture.nativeElement as HTMLElement;
+    const clickSpy = vi.spyOn(el, 'click').mockImplementation(() => {});
+    const event = new KeyboardEvent('keydown', { key: ' ' });
+    el.dispatchEvent(event);
+    expect(clickSpy).toHaveBeenCalled();
+    clickSpy.mockRestore();
+  });
+
+  it('should not click on other keys', () => {
+    const el = fixture.nativeElement as HTMLElement;
+    const clickSpy = vi.spyOn(el, 'click').mockImplementation(() => {});
+    el.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab' }));
+    expect(clickSpy).not.toHaveBeenCalled();
+    clickSpy.mockRestore();
+  });
+
+  it('should not click when disabled', async () => {
+    fixture.componentRef.setInput('disabled', true);
+    await fixture.whenStable();
+    const el = fixture.nativeElement as HTMLElement;
+    const clickSpy = vi.spyOn(el, 'click').mockImplementation(() => {});
+    el.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter' }));
+    expect(clickSpy).not.toHaveBeenCalled();
+    clickSpy.mockRestore();
   });
 });

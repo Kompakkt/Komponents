@@ -59,7 +59,7 @@ export class InputComponent implements OnInit, OnDestroy {
     if (this.type() === 'number') {
       const cleanedValue = value.toString().replace(/[^0-9.]/g, '');
       const valueAsNumber = Number(cleanedValue);
-      const clampedNumber = Math.min(Math.max(this.min(), valueAsNumber));
+      const clampedNumber = Math.min(Math.max(valueAsNumber, this.min()), this.max());
       this.value.set(clampedNumber.toString());
     } else {
       this.value.set(value.toString());

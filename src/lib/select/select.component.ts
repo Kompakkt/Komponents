@@ -93,14 +93,14 @@ export class SelectComponent implements AfterContentInit, OnDestroy {
 
   #selectValue(optionValue: string): void {
     const option = this.options.find(o => o.value() === optionValue);
-    if (!option || option.disabled()) return;
+    if (!option || option.isDisabled) return;
     this.#applyValue(optionValue);
     this.dropdown()?.nativeElement.hidePopover();
   }
 
   #applyValue(optionValue: string): void {
     const option = this.options.find(o => o.value() === optionValue);
-    if (!option || option.disabled()) return;
+    if (!option || option.isDisabled) return;
     this.value.set(optionValue);
     this.triggerText.set(option.elementRef.nativeElement.textContent?.trim() ?? '');
     this.options.forEach(o => (o.selected = o.value() === optionValue));
@@ -111,7 +111,7 @@ export class SelectComponent implements AfterContentInit, OnDestroy {
     const optionEl = target.closest('k-menu-option');
     if (!optionEl) return;
     const option = this.options.find(o => o.elementRef.nativeElement === optionEl);
-    if (option && !option.disabled() && option.value()) {
+    if (option && !option.isDisabled && option.value()) {
       this.#selectValue(option.value()!);
     }
   }

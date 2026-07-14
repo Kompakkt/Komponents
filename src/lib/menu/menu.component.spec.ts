@@ -47,3 +47,93 @@ describe('MenuComponent', () => {
     expect(fixture.nativeElement.style.getPropertyValue('--width')).toBe('200px');
   });
 });
+
+@Component({
+  standalone: true,
+  imports: [MenuComponent, MenuOptionComponent],
+  template: `
+    <div class="anchor">
+      <k-menu label="Actions">
+        <k-menu-option value="edit">Edit</k-menu-option>
+      </k-menu>
+    </div>
+  `,
+})
+class MenuHostComponent {}
+
+describe('MenuComponent interactions', () => {
+  function setup() {
+    (HTMLElement.prototype as any).showPopover = () => {};
+    (HTMLElement.prototype as any).hidePopover = () => {};
+    const fixture = TestBed.createComponent(MenuHostComponent);
+    const menuEl = fixture.nativeElement.querySelector('k-menu');
+    let popoverOpen = false;
+    menuEl.showPopover = () => { popoverOpen = true; };
+    menuEl.hidePopover = () => { popoverOpen = false; };
+    const realMatches = menuEl.matches.bind(menuEl);
+    menuEl.matches = (sel: string) => sel === ':popover-open' ? popoverOpen : realMatches(sel);
+    fixture.detectChanges();
+    return { fixture, menuEl, getOpen: () => popoverOpen, setOpen: (v: boolean) => { popoverOpen = v; } };
+  }
+
+  afterEach(() => {
+    delete (HTMLElement.prototype as any).showPopover;
+    delete (HTMLElement.prototype as any).hidePopover;
+  });
+
+  it('shows popover on parent mouseenter', () => {
+    const { fixture, getOpen } = setup();
+    fixture.nativeElement.querySelector('.anchor').dispatchEvent(new Event('mouseenter'));
+    expect(getOpen()).toBe(true);
+  });
+
+  it('shows popover on parent focus', () => {
+    const { fixture, getOpen } = setup();
+    fixture.nativeElement.querySelector('.anchor').dispatchEvent(new Event('focus'));
+    expect(getOpen()).toBe(true);
+  });
+
+  it('hides popover on parent blur', () => {
+    const { fixture, setOpen, getOpen } = setup();
+    setOpen(true);
+    fixture.nativeElement.querySelector('.anchor').dispatchEvent(new Event('blur'));
+    expect(getOpen()).toBe(false);
+  });
+
+  it('hides popover when mouse leaves parent to outside', () => {
+    const { fixture, menuEl, setOpen, getOpen } = setup();
+    setOpen(true);
+    const ev = new MouseEvent('mouseleave');
+    Object.defineProperty(ev, 'relatedTarget', { value: document.body });
+    fixture.nativeElement.querySelector('.anchor').dispatchEvent(ev);
+    expect(getOpen()).toBe(false);
+  });
+
+  it('does not hide when mouse leaves parent toward the popover', () => {
+    const { fixture, menuEl, setOpen, getOpen } = setup();
+    setOpen(true);
+    const ev = new MouseEvent('mouseleave');
+    Object.defineProperty(ev, 'relatedTarget', { value: menuEl });
+    fixture.nativeElement.querySelector('.anchor').dispatchEvent(ev);
+    expect(getOpen()).toBe(true);
+  });
+
+  it('does not hide when mouse leaves popover toward the anchor', () => {
+    const { fixture, menuEl, setOpen, getOpen } = setup();
+    setOpen(true);
+    const anchor = fixture.nativeElement.querySelector('.anchor');
+    const ev = new MouseEvent('mouseleave');
+    Object.defineProperty(ev, 'relatedTarget', { value: anchor });
+    menuEl.dispatchEvent(ev);
+    expect(getOpen()).toBe(true);
+  });
+
+  it('hides when mouse leaves popover to outside', () => {
+    const { fixture, menuEl, setOpen, getOpen } = setup();
+    setOpen(true);
+    const ev = new MouseEvent('mouseleave');
+    Object.defineProperty(ev, 'relatedTarget', { value: document.body });
+    menuEl.dispatchEvent(ev);
+    expect(getOpen()).toBe(false);
+  });
+});

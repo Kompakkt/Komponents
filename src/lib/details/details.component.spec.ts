@@ -61,4 +61,28 @@ describe('DetailsComponent', () => {
     header.click();
     expect(component.expanded()).toBe(true);
   });
+
+  it('should set marquee CSS variables when marquee is enabled', async () => {
+    fixture = TestBed.createComponent(DetailsComponent);
+    component = fixture.componentInstance;
+    fixture.componentRef.setInput('title', 'Long title that overflows');
+    fixture.componentRef.setInput('marquee', true);
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    const span = fixture.nativeElement.querySelector('.title-viewport span');
+    expect(span.style.getPropertyValue('--marquee-distance')).toBe('0px');
+    expect(span.style.getPropertyValue('--marquee-duration')).toBe('1s');
+  });
+
+  it('should not set marquee variables when marquee is disabled', async () => {
+    fixture = TestBed.createComponent(DetailsComponent);
+    component = fixture.componentInstance;
+    fixture.componentRef.setInput('title', 'Title');
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    const span = fixture.nativeElement.querySelector('.title-viewport span');
+    expect(span.style.getPropertyValue('--marquee-distance')).toBe('');
+  });
 });

@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { vi } from 'vitest';
 import { SliderComponent } from './slider.component';
 
 describe('SliderComponent', () => {
@@ -91,5 +92,85 @@ describe('SliderComponent', () => {
     fixture.detectChanges();
     await fixture.whenStable();
     expect(component.value()).toBe(75);
+  });
+});
+
+describe('SliderComponent value math', () => {
+  function mockRect(el: HTMLElement, r: { x: number; y: number; w: number; h: number }) {
+    vi.spyOn(el, 'getBoundingClientRect').mockImplementation(() => ({
+      left: r.x,
+      right: r.x + r.w,
+      top: r.y,
+      bottom: r.y + r.h,
+      width: r.w,
+      height: r.h,
+      x: r.x,
+      y: r.y,
+      toJSON: () => ({}),
+    }));
+  }
+
+  function createSlider(overrides: { min?: number; max?: number; step?: number; direction?: 'left-to-right' | 'bottom-to-top' } = {}) {
+    const f = TestBed.createComponent(SliderComponent);
+    f.componentRef.setInput('label', 'Vol');
+    if (overrides.min !== undefined) f.componentRef.setInput('min', overrides.min);
+    if (overrides.max !== undefined) f.componentRef.setInput('max', overrides.max);
+    if (overrides.step !== undefined) f.componentRef.setInput('step', overrides.step);
+    if (overrides.direction) f.componentRef.setInput('direction', overrides.direction);
+    f.detectChanges();
+    const rail = f.nativeElement.querySelector('.slider-rail');
+    const handle = f.nativeElement.querySelector('.slider-handle');
+    return { f, rail, handle };
+  }
+
+  it('computes value from a horizontal rail click', async () => {
+    const { f, rail, handle } = createSlider();
+    await f.whenStable();
+    mockRect(rail, { x: 0, y: 0, w: 200, h: 20 });
+    mockRect(handle, { x: 0, y: 0, w: 20, h: 20 });
+
+    rail.dispatchEvent(new MouseEvent('click', { clientX: 100, clientY: 10 }));
+    f.detectChanges();
+    // clickPosition = 100 - 0 - 10 = 90; available = 200 - 20 = 180; value = 90/180*100 = 50
+    expect(f.componentInstance.value()).toBeCloseTo(50, 1);
+  });
+
+  it('clamps to min and max', async () => {
+    const { f, rail, handle } = createSlider({ min: 0, max: 100 });
+    await f.whenStable();
+    mockRect(rail, { x: 0, y: 0, w: 200, h: 20 });
+    mockRect(handle, { x: 0, y: 0, w: 20, h: 20 });
+
+    rail.dispatchEvent(new MouseEvent('click', { clientX: -50, clientY: 10 }));
+    f.detectChanges();
+    expect(f.componentInstance.value()).toBe(0);
+
+    rail.dispatchEvent(new MouseEvent('click', { clientX: 999, clientY: 10 }));
+    f.detectChanges();
+    expect(f.componentInstance.value()).toBe(100);
+  });
+
+  it('snaps to step', async () => {
+    const { f, rail, handle } = createSlider({ step: 25 });
+    await f.whenStable();
+    mockRect(rail, { x: 0, y: 0, w: 200, h: 20 });
+    mockRect(handle, { x: 0, y: 0, w: 20, h: 20 });
+
+    rail.dispatchEvent(new MouseEvent('click', { clientX: 91, clientY: 10 }));
+    f.detectChanges();
+    // raw ≈ 45.28; snapped to nearest 25 = 50
+    expect(f.componentInstance.value()).toBe(50);
+  });
+
+  it('computes value for vertical (bottom-to-top) direction', async () => {
+    const { f, rail, handle } = createSlider({ direction: 'bottom-to-top' });
+    await f.whenStable();
+    mockRect(rail, { x: 0, y: 0, w: 20, h: 200 });
+    mockRect(handle, { x: 0, y: 0, w: 20, h: 20 });
+
+    rail.dispatchEvent(new MouseEvent('click', { clientX: 10, clientY: 100 }));
+    f.detectChanges();
+    // clickPosition = 200 - 100 - 10 = 90; available = 200 - 20 = 180; value = 50
+    expect(f.componentInstance.value()).toBeCloseTo(50, 1);
   });
 });
