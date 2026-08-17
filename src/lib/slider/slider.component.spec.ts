@@ -110,7 +110,14 @@ describe('SliderComponent value math', () => {
     }));
   }
 
-  function createSlider(overrides: { min?: number; max?: number; step?: number; direction?: 'left-to-right' | 'bottom-to-top' } = {}) {
+  function createSlider(
+    overrides: {
+      min?: number;
+      max?: number;
+      step?: number;
+      direction?: 'left-to-right' | 'bottom-to-top';
+    } = {},
+  ) {
     const f = TestBed.createComponent(SliderComponent);
     f.componentRef.setInput('label', 'Vol');
     if (overrides.min !== undefined) f.componentRef.setInput('min', overrides.min);

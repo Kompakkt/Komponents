@@ -169,7 +169,9 @@ describe('SelectComponent selection', () => {
     const fixture = TestBed.createComponent(SelectHostComponent);
     let toggleCalled = false;
     const dropdown = fixture.nativeElement.querySelector('.dropdown');
-    dropdown.togglePopover = () => { toggleCalled = true; };
+    dropdown.togglePopover = () => {
+      toggleCalled = true;
+    };
     fixture.detectChanges();
     await fixture.whenStable();
 
@@ -185,7 +187,9 @@ describe('SelectComponent selection', () => {
     fixture.componentInstance.disabled = true;
     let toggleCalled = false;
     const dropdown = fixture.nativeElement.querySelector('.dropdown');
-    dropdown.togglePopover = () => { toggleCalled = true; };
+    dropdown.togglePopover = () => {
+      toggleCalled = true;
+    };
     fixture.detectChanges();
     await fixture.whenStable();
 

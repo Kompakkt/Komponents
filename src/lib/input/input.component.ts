@@ -36,6 +36,8 @@ export class InputComponent {
 
   focused = signal(false);
 
+  #lastAppliedStartingValue?: string | number;
+
   @HostBinding('class.floating-label')
   get isFloatingLabel() {
     return this.floatingLabel();
@@ -47,7 +49,9 @@ export class InputComponent {
     });
     effect(() => {
       const sv = this.startingValue();
-      if (sv === undefined || sv === this.value()) return;
+      if (sv === undefined || sv === this.#lastAppliedStartingValue) return;
+      this.#lastAppliedStartingValue = sv;
+      if (String(sv) === this.value()) return;
       this.#updateValue(sv);
     });
   }

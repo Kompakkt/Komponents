@@ -45,7 +45,9 @@ describe('TooltipDirective', () => {
   it('hides tooltip on mouseleave', () => {
     const fixture = setup();
     let hideCalled = false;
-    (HTMLElement.prototype as any).hidePopover = () => { hideCalled = true; };
+    (HTMLElement.prototype as any).hidePopover = () => {
+      hideCalled = true;
+    };
     const button = fixture.nativeElement.querySelector('button');
     button.dispatchEvent(new Event('mouseenter'));
     button.dispatchEvent(new Event('mouseleave'));
@@ -54,7 +56,9 @@ describe('TooltipDirective', () => {
 
   it('does not show when text is empty', () => {
     let showCalled = false;
-    (HTMLElement.prototype as any).showPopover = () => { showCalled = true; };
+    (HTMLElement.prototype as any).showPopover = () => {
+      showCalled = true;
+    };
     const fixture = setup({ tooltipText: '' });
     fixture.nativeElement.querySelector('button').dispatchEvent(new Event('mouseenter'));
     expect(showCalled).toBe(false);

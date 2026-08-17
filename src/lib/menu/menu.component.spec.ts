@@ -68,12 +68,23 @@ describe('MenuComponent interactions', () => {
     const fixture = TestBed.createComponent(MenuHostComponent);
     const menuEl = fixture.nativeElement.querySelector('k-menu');
     let popoverOpen = false;
-    menuEl.showPopover = () => { popoverOpen = true; };
-    menuEl.hidePopover = () => { popoverOpen = false; };
+    menuEl.showPopover = () => {
+      popoverOpen = true;
+    };
+    menuEl.hidePopover = () => {
+      popoverOpen = false;
+    };
     const realMatches = menuEl.matches.bind(menuEl);
-    menuEl.matches = (sel: string) => sel === ':popover-open' ? popoverOpen : realMatches(sel);
+    menuEl.matches = (sel: string) => (sel === ':popover-open' ? popoverOpen : realMatches(sel));
     fixture.detectChanges();
-    return { fixture, menuEl, getOpen: () => popoverOpen, setOpen: (v: boolean) => { popoverOpen = v; } };
+    return {
+      fixture,
+      menuEl,
+      getOpen: () => popoverOpen,
+      setOpen: (v: boolean) => {
+        popoverOpen = v;
+      },
+    };
   }
 
   afterEach(() => {

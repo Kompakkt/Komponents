@@ -29,11 +29,7 @@ export interface TestFormData {
     MenuOptionComponent,
   ],
   template: `
-    <k-input
-      label="Name"
-      [startingValue]="form().name"
-      (valueChanged)="onNameChange($event)"
-    />
+    <k-input label="Name" [startingValue]="form().name" (valueChanged)="onNameChange($event)" />
     <k-slider
       label="Volume"
       [startingValue]="form().volume"
@@ -49,16 +45,8 @@ export interface TestFormData {
       [startingValue]="form().toggle"
       (checkedChange)="onToggleChange($event)"
     />
-    <k-textarea
-      label="Bio"
-      [startingValue]="form().bio"
-      (valueChanged)="onBioChange($event)"
-    />
-    <k-select
-      label="Color"
-      [startingValue]="form().color"
-      (valueChanged)="onColorChange($event)"
-    >
+    <k-textarea label="Bio" [startingValue]="form().bio" (valueChanged)="onBioChange($event)" />
+    <k-select label="Color" [startingValue]="form().color" (valueChanged)="onColorChange($event)">
       <k-menu-option value="red">Red</k-menu-option>
       <k-menu-option value="green">Green</k-menu-option>
       <k-menu-option value="blue">Blue</k-menu-option>

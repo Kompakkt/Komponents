@@ -103,6 +103,47 @@ describe('InputComponent', () => {
     expect(component.value()).toBe('second');
   });
 
+  it('should not reset typed value while startingValue stays unchanged', async () => {
+    fixture.componentRef.setInput('startingValue', 'old');
+    fixture.detectChanges();
+    await fixture.whenStable();
+    const input = fixture.nativeElement.querySelector('input');
+    input.value = 'Foo';
+    input.dispatchEvent(new Event('input'));
+    fixture.detectChanges();
+    await fixture.whenStable();
+    expect(component.value()).toBe('Foo');
+    expect(input.value).toBe('Foo');
+  });
+
+  it('should emit every keystroke when parent does not write back to startingValue', async () => {
+    const values: string[] = [];
+    component.valueChanged.subscribe(v => values.push(v.value));
+    const input = fixture.nativeElement.querySelector('input');
+    for (const partial of ['F', 'Fo', 'Foo']) {
+      input.value = partial;
+      input.dispatchEvent(new Event('input'));
+      fixture.detectChanges();
+      await fixture.whenStable();
+    }
+    expect(values[values.length - 1]).toBe('Foo');
+  });
+
+  it('should emit every keystroke when parent echoes value back via startingValue', async () => {
+    const values: string[] = [];
+    component.valueChanged.subscribe(v => values.push(v.value));
+    component.valueChanged.subscribe(v => fixture.componentRef.setInput('startingValue', v.value));
+    const input = fixture.nativeElement.querySelector('input');
+    for (const partial of ['F', 'Fo', 'Foo']) {
+      input.value = partial;
+      input.dispatchEvent(new Event('input'));
+      fixture.detectChanges();
+      await fixture.whenStable();
+    }
+    expect(values[values.length - 1]).toBe('Foo');
+    expect(input.value).toBe('Foo');
+  });
+
   it('should emit initial value on initialization (effect-driven)', () => {
     const f = TestBed.createComponent(InputComponent);
     f.componentRef.setInput('label', 'Test');

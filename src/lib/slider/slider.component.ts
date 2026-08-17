@@ -64,7 +64,9 @@ export class SliderComponent implements AfterViewInit {
     const onMouseDown = (e: MouseEvent) => {
       if (e.target === handle) this.isDragging = true;
     };
-    const onMouseUp = () => { this.isDragging = false; };
+    const onMouseUp = () => {
+      this.isDragging = false;
+    };
     const onMouseMove = (e: MouseEvent) => {
       if (this.isDragging) this.#updateValue(e);
     };
