@@ -1,0 +1,21 @@
+:host {
+  display: block;
+}
+
+.model {
+  ul {
+    margin: 0.25rem 0;
+    padding-left: 1.25rem;
+  }
+}
+
+.card {
+  border: 1px solid var(--border, #ccc);
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+
+  h3 {
+    margin-top: 0;
+  }
+}

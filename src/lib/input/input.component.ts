@@ -1,12 +1,4 @@
-import {
-  booleanAttribute,
-  Component,
-  effect,
-  HostBinding,
-  input,
-  output,
-  signal,
-} from '@angular/core';
+import { booleanAttribute, Component, HostBinding, input, model, signal } from '@angular/core';
 
 export type InputType = 'text' | 'number' | 'username' | 'password' | 'email' | 'tel' | 'url';
 
@@ -27,45 +19,19 @@ export class InputComponent {
   autocomplete = input<string>('off');
   placeholder = input('');
 
-  startingValue = input<string | number>();
-  value = signal('');
-  valueChanged = output<{ value: string; valueAsNumber: number }>();
-
+  value = model('');
   prefix = input('');
   suffix = input('');
 
   focused = signal(false);
-
-  #lastAppliedStartingValue?: string | number;
 
   @HostBinding('class.floating-label')
   get isFloatingLabel() {
     return this.floatingLabel();
   }
 
-  constructor() {
-    effect(() => {
-      this.valueChanged.emit({ value: this.value(), valueAsNumber: Number(this.value()) });
-    });
-    effect(() => {
-      const sv = this.startingValue();
-      if (sv === undefined || sv === this.#lastAppliedStartingValue) return;
-      this.#lastAppliedStartingValue = sv;
-      if (String(sv) === this.value()) return;
-      this.#updateValue(sv);
-    });
-  }
-
-  #updateValue(value: string | number) {
-    if (this.type() === 'number') {
-      this.value.set(value.toString());
-    } else {
-      this.value.set(value.toString());
-    }
-  }
-
   onValueChangeEvent(event: Event) {
     const el = event.target as HTMLInputElement;
-    this.#updateValue(el.value);
+    this.value.set(el.value);
   }
 }

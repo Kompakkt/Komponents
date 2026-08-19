@@ -15,6 +15,8 @@ import { ExampleWizardComponent } from './examples/wizard/wizard.component';
 import ExampleWizardComponentTemplate from './examples/wizard/wizard.component.html';
 import { ExampleSelectComponent } from './examples/select/select.component';
 import ExampleSelectComponentTemplate from './examples/select/select.component.html';
+import { ExampleExternalStateComponent } from './examples/external-state/external-state.component';
+import ExampleExternalStateComponentTemplate from './examples/external-state/external-state.component.html';
 
 @Component({
   selector: 'app-root',
@@ -28,6 +30,7 @@ import ExampleSelectComponentTemplate from './examples/select/select.component.h
     ExampleInputElementsComponent,
     ExampleWizardComponent,
     ExampleSelectComponent,
+    ExampleExternalStateComponent,
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
@@ -42,5 +45,6 @@ export class AppComponent {
     inputElements: ExampleInputElementsComponentTemplate,
     wizard: ExampleWizardComponentTemplate,
     select: ExampleSelectComponentTemplate,
+    externalState: ExampleExternalStateComponentTemplate,
   };
 }

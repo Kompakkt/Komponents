@@ -1,0 +1,64 @@
+<p>
+  Parent drives every component below via two-way bindings. Every second an interval mutates the
+  parent values, so any change you make is overwritten within ~1s (proving external -> component
+  propagation) and the parent state below updates from your edits (component -> parent). Tick:
+  {{ ticks() }}
+</p>
+
+<section class="card model">
+  <h3>Parent (live) state</h3>
+  <ul>
+    <li>
+      checked: <strong>{{ checked() }}</strong>
+    </li>
+    <li>
+      toggle: <strong>{{ toggle() }}</strong>
+    </li>
+    <li>
+      volume: <strong>{{ volume() }}</strong>
+    </li>
+    <li>
+      bio: <strong>{{ bio() || '(empty)' }}</strong>
+    </li>
+    <li>
+      tag: <strong>{{ tag() }}</strong>
+    </li>
+    <li>
+      label: <strong>{{ label() }}</strong>
+    </li>
+  </ul>
+</section>
+
+<section class="card">
+  <h3>Labelled checkbox (auto-toggled every second)</h3>
+  <k-labelled-checkbox [label]="label()" [(checked)]="checked" />
+</section>
+
+<section class="card">
+  <h3>Slide toggle (auto-toggled every second)</h3>
+  <k-slide-toggle [label]="'Auto toggle'" [(checked)]="toggle" />
+</section>
+
+<section class="card">
+  <h3>Slider (auto-ramps 0-100)</h3>
+  <k-slider [label]="'Volume'" [(value)]="volume" />
+</section>
+
+<section class="card">
+  <h3>Input (label auto-changes; type to edit value)</h3>
+  <k-input [label]="'Text'" [(value)]="bio" />
+</section>
+
+<section class="card">
+  <h3>Textarea</h3>
+  <k-textarea [label]="'Bio'" [(value)]="bio" />
+</section>
+
+<section class="card">
+  <h3>Select (cycles a/b/c every second)</h3>
+  <k-select [label]="'Tag'" [(value)]="tag">
+    <k-menu-option value="a">Alpha</k-menu-option>
+    <k-menu-option value="b">Bravo</k-menu-option>
+    <k-menu-option value="c">Charlie</k-menu-option>
+  </k-select>
+</section>

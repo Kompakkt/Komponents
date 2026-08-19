@@ -1,5 +1,16 @@
+import { Component, signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { InputComponent } from './input.component';
+
+@Component({
+  standalone: true,
+  imports: [InputComponent],
+  template: `<k-input [label]="label" [(value)]="value" />`,
+})
+class InputHostComponent {
+  label = 'Name';
+  value = '';
+}
 
 describe('InputComponent', () => {
   let fixture: ComponentFixture<InputComponent>;
@@ -42,15 +53,24 @@ describe('InputComponent', () => {
     expect(component.value()).toBe('hello');
   });
 
-  it('should emit valueChanged on value change', async () => {
-    const values: Array<{ value: string; valueAsNumber: number }> = [];
-    component.valueChanged.subscribe(v => values.push(v));
-    const input = fixture.nativeElement.querySelector('input');
-    input.value = 'test';
-    input.dispatchEvent(new Event('input'));
+  it('should reflect an initially bound value', async () => {
+    fixture = TestBed.createComponent(InputComponent);
+    component = fixture.componentInstance;
+    fixture.componentRef.setInput('label', 'Prefilled');
+    fixture.componentRef.setInput('value', 'pre');
     fixture.detectChanges();
     await fixture.whenStable();
-    expect(values.some(v => v.value === 'test')).toBe(true);
+    expect(component.value()).toBe('pre');
+  });
+
+  it('should react to late external value changes', async () => {
+    fixture.componentRef.setInput('value', 'first');
+    fixture.detectChanges();
+    await fixture.whenStable();
+    fixture.componentRef.setInput('value', 'second');
+    fixture.detectChanges();
+    await fixture.whenStable();
+    expect(component.value()).toBe('second');
   });
 
   it('should handle floatingLabel="" attribute via booleanAttribute', async () => {
@@ -65,93 +85,6 @@ describe('InputComponent', () => {
     fixture.detectChanges();
     await fixture.whenStable();
     expect(fixture.nativeElement.classList.contains('floating-label')).toBe(true);
-  });
-
-  it('should emit correct values on sequential changes', async () => {
-    const values: Array<{ value: string; valueAsNumber: number }> = [];
-    component.valueChanged.subscribe(v => values.push(v));
-    const input = fixture.nativeElement.querySelector('input');
-    input.value = 'first';
-    input.dispatchEvent(new Event('input'));
-    fixture.detectChanges();
-    await fixture.whenStable();
-    input.value = 'second';
-    input.dispatchEvent(new Event('input'));
-    fixture.detectChanges();
-    await fixture.whenStable();
-    const last = values[values.length - 1];
-    expect(last.value).toBe('second');
-  });
-
-  it('should reflect startingValue', async () => {
-    fixture = TestBed.createComponent(InputComponent);
-    component = fixture.componentInstance;
-    fixture.componentRef.setInput('label', 'Prefilled');
-    fixture.componentRef.setInput('startingValue', 'pre');
-    fixture.detectChanges();
-    await fixture.whenStable();
-    expect(component.value()).toBe('pre');
-  });
-
-  it('should react to late startingValue changes', async () => {
-    fixture.componentRef.setInput('startingValue', 'first');
-    fixture.detectChanges();
-    await fixture.whenStable();
-    fixture.componentRef.setInput('startingValue', 'second');
-    fixture.detectChanges();
-    await fixture.whenStable();
-    expect(component.value()).toBe('second');
-  });
-
-  it('should not reset typed value while startingValue stays unchanged', async () => {
-    fixture.componentRef.setInput('startingValue', 'old');
-    fixture.detectChanges();
-    await fixture.whenStable();
-    const input = fixture.nativeElement.querySelector('input');
-    input.value = 'Foo';
-    input.dispatchEvent(new Event('input'));
-    fixture.detectChanges();
-    await fixture.whenStable();
-    expect(component.value()).toBe('Foo');
-    expect(input.value).toBe('Foo');
-  });
-
-  it('should emit every keystroke when parent does not write back to startingValue', async () => {
-    const values: string[] = [];
-    component.valueChanged.subscribe(v => values.push(v.value));
-    const input = fixture.nativeElement.querySelector('input');
-    for (const partial of ['F', 'Fo', 'Foo']) {
-      input.value = partial;
-      input.dispatchEvent(new Event('input'));
-      fixture.detectChanges();
-      await fixture.whenStable();
-    }
-    expect(values[values.length - 1]).toBe('Foo');
-  });
-
-  it('should emit every keystroke when parent echoes value back via startingValue', async () => {
-    const values: string[] = [];
-    component.valueChanged.subscribe(v => values.push(v.value));
-    component.valueChanged.subscribe(v => fixture.componentRef.setInput('startingValue', v.value));
-    const input = fixture.nativeElement.querySelector('input');
-    for (const partial of ['F', 'Fo', 'Foo']) {
-      input.value = partial;
-      input.dispatchEvent(new Event('input'));
-      fixture.detectChanges();
-      await fixture.whenStable();
-    }
-    expect(values[values.length - 1]).toBe('Foo');
-    expect(input.value).toBe('Foo');
-  });
-
-  it('should emit initial value on initialization (effect-driven)', () => {
-    const f = TestBed.createComponent(InputComponent);
-    f.componentRef.setInput('label', 'Test');
-    const values: Array<{ value: string; valueAsNumber: number }> = [];
-    f.componentInstance.valueChanged.subscribe(v => values.push(v));
-    f.detectChanges();
-    expect(values.length).toBe(1);
-    expect(values[0].value).toBe('');
   });
 
   it('should display prefix and suffix', async () => {
@@ -189,5 +122,113 @@ describe('InputComponent', () => {
     component.focused.set(true);
     input.dispatchEvent(new Event('blur'));
     expect(component.focused()).toBe(false);
+  });
+});
+
+describe('InputComponent with host bindings', () => {
+  let fixture: ComponentFixture<InputHostComponent>;
+  let host: InputHostComponent;
+
+  beforeEach(async () => {
+    fixture = TestBed.createComponent(InputHostComponent);
+    host = fixture.componentInstance;
+    fixture.detectChanges();
+    await fixture.whenStable();
+  });
+
+  function getInput() {
+    return fixture.nativeElement.querySelector('input');
+  }
+
+  it('should not emit valueChange during initialization', async () => {
+    const emitted: string[] = [];
+    @Component({
+      standalone: true,
+      imports: [InputComponent],
+      template: `<k-input [label]="'Test'" (valueChange)="emitted.push($event)" />`,
+    })
+    class EmitHostComponent {
+      emitted = emitted;
+    }
+    const f = TestBed.createComponent(EmitHostComponent);
+    f.detectChanges();
+    await f.whenStable();
+    expect(emitted).toEqual([]);
+  });
+
+  it('should emit valueChange on user input only', async () => {
+    const emitted: string[] = [];
+    @Component({
+      standalone: true,
+      imports: [InputComponent],
+      template: `<k-input [label]="'Test'" (valueChange)="emitted.push($event)" />`,
+    })
+    class EmitHostComponent {
+      emitted = emitted;
+    }
+    const f = TestBed.createComponent(EmitHostComponent);
+    f.detectChanges();
+    await f.whenStable();
+
+    const input = f.nativeElement.querySelector('input');
+    input.value = 'test';
+    input.dispatchEvent(new Event('input'));
+    f.detectChanges();
+    await f.whenStable();
+
+    expect(f.componentInstance.emitted).toEqual(['test']);
+  });
+
+  it('should update the two-way bound host field on typing', async () => {
+    const input = getInput();
+    input.value = 'Foo';
+    input.dispatchEvent(new Event('input'));
+    fixture.detectChanges();
+    await fixture.whenStable();
+    expect(host.value).toBe('Foo');
+    expect(input.value).toBe('Foo');
+  });
+
+  it('should emit every keystroke when parent echoes value back', async () => {
+    @Component({
+      standalone: true,
+      imports: [InputComponent],
+      template: `<k-input [label]="'Test'" [value]="value()" (valueChange)="value.set($event)" />`,
+    })
+    class EchoHostComponent {
+      value = signal('');
+    }
+    const f = TestBed.createComponent(EchoHostComponent);
+    f.detectChanges();
+    await f.whenStable();
+
+    const input = f.nativeElement.querySelector('input');
+    for (const partial of ['F', 'Fo', 'Foo']) {
+      input.value = partial;
+      input.dispatchEvent(new Event('input'));
+      f.detectChanges();
+      await f.whenStable();
+    }
+    expect(f.componentInstance.value()).toBe('Foo');
+    expect(input.value).toBe('Foo');
+  });
+
+  it('should reflect late external value changes in one-way binding', async () => {
+    @Component({
+      standalone: true,
+      imports: [InputComponent],
+      template: `<k-input [label]="'Test'" [value]="value()" />`,
+    })
+    class OneWayHostComponent {
+      value = signal('');
+    }
+    const f = TestBed.createComponent(OneWayHostComponent);
+    f.detectChanges();
+    await f.whenStable();
+
+    f.componentInstance.value.set('external');
+    f.detectChanges();
+    await f.whenStable();
+    expect(f.nativeElement.querySelector('input').value).toBe('external');
   });
 });

@@ -1,13 +1,4 @@
-import {
-  Component,
-  effect,
-  ElementRef,
-  HostBinding,
-  input,
-  output,
-  signal,
-  viewChild,
-} from '@angular/core';
+import { Component, ElementRef, HostBinding, input, model, viewChild } from '@angular/core';
 
 @Component({
   selector: 'k-textarea',
@@ -22,9 +13,7 @@ export class TextareaComponent {
   label = input.required<string>();
   placeholder = input('');
 
-  startingValue = input<string>();
-  value = signal('');
-  valueChanged = output<{ value: string }>();
+  value = model('');
 
   prefix = input('');
   suffix = input('');
@@ -35,23 +24,9 @@ export class TextareaComponent {
     alias: 'resize',
   });
 
-  constructor() {
-    effect(() => {
-      this.valueChanged.emit({ value: this.value() });
-    });
-    effect(() => {
-      const sv = this.startingValue();
-      if (sv !== undefined) this.#updateValue(sv);
-    });
-  }
-
-  #updateValue(value: string) {
-    this.value.set(value.toString());
-  }
-
   onValueChangeEvent(event: Event) {
     const el = event.target as HTMLInputElement;
-    this.#updateValue(el.value);
+    this.value.set(el.value);
   }
 
   @HostBinding('style.--resize')

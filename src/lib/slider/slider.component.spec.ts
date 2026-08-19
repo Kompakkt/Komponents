@@ -1,6 +1,17 @@
+import { Component, signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { vi } from 'vitest';
 import { SliderComponent } from './slider.component';
+
+@Component({
+  standalone: true,
+  imports: [SliderComponent],
+  template: `<k-slider [label]="label" [(value)]="value" />`,
+})
+class SliderHostComponent {
+  label = 'Volume';
+  value = 0;
+}
 
 describe('SliderComponent', () => {
   let fixture: ComponentFixture<SliderComponent>;
@@ -55,43 +66,98 @@ describe('SliderComponent', () => {
     expect(component.handlePosition()).toBe(0);
   });
 
-  it('should emit valueChanged on value change', () => {
-    const values: number[] = [];
-    component.valueChanged.subscribe(v => values.push(v));
-    component.value.set(25);
-    fixture.detectChanges();
-    component.value.set(50);
-    fixture.detectChanges();
-    expect(values).toEqual([25, 50]);
-  });
-
-  it('should react to late startingValue changes', async () => {
-    fixture.componentRef.setInput('startingValue', 25);
-    fixture.detectChanges();
-    await fixture.whenStable();
-    fixture.componentRef.setInput('startingValue', 75);
-    fixture.detectChanges();
-    await fixture.whenStable();
-    expect(component.value()).toBe(75);
-  });
-
-  it('should not emit valueChanged during initialization', () => {
-    const f = TestBed.createComponent(SliderComponent);
-    f.componentRef.setInput('label', 'Test');
-    const values: number[] = [];
-    f.componentInstance.valueChanged.subscribe(v => values.push(v));
-    f.detectChanges();
-    expect(values).toEqual([0]);
-  });
-
-  it('should reflect startingValue', async () => {
+  it('should reflect an initially bound value', async () => {
     fixture = TestBed.createComponent(SliderComponent);
     component = fixture.componentInstance;
     fixture.componentRef.setInput('label', 'Volume');
-    fixture.componentRef.setInput('startingValue', 75);
+    fixture.componentRef.setInput('value', 75);
     fixture.detectChanges();
     await fixture.whenStable();
     expect(component.value()).toBe(75);
+  });
+
+  it('should react to late external value changes', async () => {
+    fixture.componentRef.setInput('value', 25);
+    fixture.detectChanges();
+    await fixture.whenStable();
+    fixture.componentRef.setInput('value', 75);
+    fixture.detectChanges();
+    await fixture.whenStable();
+    expect(component.value()).toBe(75);
+  });
+});
+
+describe('SliderComponent with host bindings', () => {
+  it('should not emit valueChange during initialization', async () => {
+    const emitted: number[] = [];
+    @Component({
+      standalone: true,
+      imports: [SliderComponent],
+      template: `<k-slider [label]="'Test'" (valueChange)="emitted.push($event)" />`,
+    })
+    class EmitHostComponent {
+      emitted = emitted;
+    }
+    const f = TestBed.createComponent(EmitHostComponent);
+    f.detectChanges();
+    await f.whenStable();
+    expect(emitted).toEqual([]);
+  });
+
+  it('should update the two-way bound host field on rail click', async () => {
+    const fixture = TestBed.createComponent(SliderHostComponent);
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    const rail = fixture.nativeElement.querySelector('.slider-rail');
+    const handle = fixture.nativeElement.querySelector('.slider-handle');
+    vi.spyOn(rail, 'getBoundingClientRect').mockImplementation(() => ({
+      left: 0,
+      right: 200,
+      top: 0,
+      bottom: 20,
+      width: 200,
+      height: 20,
+      x: 0,
+      y: 0,
+      toJSON: () => ({}),
+    }));
+    vi.spyOn(handle, 'getBoundingClientRect').mockImplementation(() => ({
+      left: 0,
+      right: 20,
+      top: 0,
+      bottom: 20,
+      width: 20,
+      height: 20,
+      x: 0,
+      y: 0,
+      toJSON: () => ({}),
+    }));
+
+    rail.dispatchEvent(new MouseEvent('click', { clientX: 100, clientY: 10 }));
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    expect(fixture.componentInstance.value).toBeCloseTo(50, 1);
+  });
+
+  it('should reflect late external value changes in one-way binding', async () => {
+    @Component({
+      standalone: true,
+      imports: [SliderComponent],
+      template: `<k-slider [label]="'Test'" [value]="value()" />`,
+    })
+    class OneWayHostComponent {
+      value = signal(0);
+    }
+    const f = TestBed.createComponent(OneWayHostComponent);
+    f.detectChanges();
+    await f.whenStable();
+
+    f.componentInstance.value.set(75);
+    f.detectChanges();
+    await f.whenStable();
+    expect(f.nativeElement.querySelector('.slider-value-tooltip').textContent).toBe('75');
   });
 });
 
@@ -136,10 +202,27 @@ describe('SliderComponent value math', () => {
     mockRect(rail, { x: 0, y: 0, w: 200, h: 20 });
     mockRect(handle, { x: 0, y: 0, w: 20, h: 20 });
 
-    rail.dispatchEvent(new MouseEvent('click', { clientX: 100, clientY: 10 }));
-    f.detectChanges();
+    const emitted: number[] = [];
+    @Component({
+      standalone: true,
+      imports: [SliderComponent],
+      template: `<k-slider [label]="'Vol'" (valueChange)="emitted.push($event)" />`,
+    })
+    class EmitHostComponent {
+      emitted = emitted;
+    }
+    const ef = TestBed.createComponent(EmitHostComponent);
+    ef.detectChanges();
+    await ef.whenStable();
+    const eRail = ef.nativeElement.querySelector('.slider-rail');
+    const eHandle = ef.nativeElement.querySelector('.slider-handle');
+    mockRect(eRail, { x: 0, y: 0, w: 200, h: 20 });
+    mockRect(eHandle, { x: 0, y: 0, w: 20, h: 20 });
+
+    eRail.dispatchEvent(new MouseEvent('click', { clientX: 100, clientY: 10 }));
+    ef.detectChanges();
     // clickPosition = 100 - 0 - 10 = 90; available = 200 - 20 = 180; value = 90/180*100 = 50
-    expect(f.componentInstance.value()).toBeCloseTo(50, 1);
+    expect(ef.componentInstance.emitted).toEqual([50]);
   });
 
   it('clamps to min and max', async () => {

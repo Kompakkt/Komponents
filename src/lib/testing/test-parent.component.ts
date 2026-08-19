@@ -7,15 +7,6 @@ import { TextareaComponent } from '../textarea/textarea.component';
 import { SelectComponent } from '../select/select.component';
 import { MenuOptionComponent } from '../menu-option/menu-option.component';
 
-export interface TestFormData {
-  name: string;
-  volume: number;
-  active: boolean;
-  toggle: boolean;
-  bio: string;
-  color: string;
-}
-
 @Component({
   selector: 'k-test-parent',
   standalone: true,
@@ -29,24 +20,12 @@ export interface TestFormData {
     MenuOptionComponent,
   ],
   template: `
-    <k-input label="Name" [startingValue]="form().name" (valueChanged)="onNameChange($event)" />
-    <k-slider
-      label="Volume"
-      [startingValue]="form().volume"
-      (valueChanged)="onVolumeChange($event)"
-    />
-    <k-labelled-checkbox
-      label="Active"
-      [startingValue]="form().active"
-      (checkedChange)="onActiveChange($event)"
-    />
-    <k-slide-toggle
-      label="Toggle"
-      [startingValue]="form().toggle"
-      (checkedChange)="onToggleChange($event)"
-    />
-    <k-textarea label="Bio" [startingValue]="form().bio" (valueChanged)="onBioChange($event)" />
-    <k-select label="Color" [startingValue]="form().color" (valueChanged)="onColorChange($event)">
+    <k-input label="Name" [(value)]="name" />
+    <k-slider label="Volume" [(value)]="volume" />
+    <k-labelled-checkbox label="Active" [(checked)]="active" />
+    <k-slide-toggle label="Toggle" [(checked)]="toggle" />
+    <k-textarea label="Bio" [(value)]="bio" />
+    <k-select label="Color" [(value)]="color">
       <k-menu-option value="red">Red</k-menu-option>
       <k-menu-option value="green">Green</k-menu-option>
       <k-menu-option value="blue">Blue</k-menu-option>
@@ -54,14 +33,12 @@ export interface TestFormData {
   `,
 })
 export class TestParentComponent {
-  form = signal<TestFormData>({
-    name: '',
-    volume: 0,
-    active: false,
-    toggle: false,
-    bio: '',
-    color: '',
-  });
+  name = signal('');
+  volume = signal(0);
+  active = signal(false);
+  toggle = signal(false);
+  bio = signal('');
+  color = signal('');
 
   @ViewChild(InputComponent) inputComp!: InputComponent;
   @ViewChild(SliderComponent) sliderComp!: SliderComponent;
@@ -69,28 +46,4 @@ export class TestParentComponent {
   @ViewChild(SlideToggleComponent) toggleComp!: SlideToggleComponent;
   @ViewChild(TextareaComponent) textareaComp!: TextareaComponent;
   @ViewChild(SelectComponent) selectComp!: SelectComponent;
-
-  onNameChange(e: { value: string }) {
-    this.form.update(f => ({ ...f, name: e.value }));
-  }
-
-  onVolumeChange(v: number) {
-    this.form.update(f => ({ ...f, volume: v }));
-  }
-
-  onActiveChange(v: boolean) {
-    this.form.update(f => ({ ...f, active: v }));
-  }
-
-  onToggleChange(v: boolean) {
-    this.form.update(f => ({ ...f, toggle: v }));
-  }
-
-  onBioChange(e: { value: string }) {
-    this.form.update(f => ({ ...f, bio: e.value }));
-  }
-
-  onColorChange(v: string) {
-    this.form.update(f => ({ ...f, color: v }));
-  }
 }

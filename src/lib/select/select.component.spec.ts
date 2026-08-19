@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { By } from '@angular/platform-browser';
 import { SelectComponent } from './select.component';
 import { MenuOptionComponent } from '../menu-option/menu-option.component';
@@ -8,7 +8,7 @@ import { MenuOptionComponent } from '../menu-option/menu-option.component';
   standalone: true,
   imports: [SelectComponent, MenuOptionComponent],
   template: `
-    <k-select [startingValue]="starting" [disabled]="disabled">
+    <k-select [value]="starting()">
       <k-menu-option value="a">Apple</k-menu-option>
       <k-menu-option value="b">Banana</k-menu-option>
       <k-menu-option value="c" disabled>Cherry</k-menu-option>
@@ -16,8 +16,7 @@ import { MenuOptionComponent } from '../menu-option/menu-option.component';
   `,
 })
 class SelectHostComponent {
-  starting = 'b';
-  disabled = false;
+  starting = signal('b');
 }
 
 describe('SelectComponent', () => {
@@ -70,12 +69,20 @@ describe('SelectComponent', () => {
     expect(component.open()).toBe(false);
   });
 
-  it('should emit initial value on initialization (effect-driven)', () => {
+  it('should not emit valueChange during initialization', () => {
     const f = TestBed.createComponent(SelectComponent);
-    const values: string[] = [];
-    f.componentInstance.valueChanged.subscribe(v => values.push(v));
-    f.detectChanges();
-    expect(values).toEqual(['']);
+    const emitted: string[] = [];
+    @Component({
+      standalone: true,
+      imports: [SelectComponent],
+      template: `<k-select (valueChange)="emitted.push($event)" />`,
+    })
+    class EmitHostComponent {
+      emitted = emitted;
+    }
+    const ef = TestBed.createComponent(EmitHostComponent);
+    ef.detectChanges();
+    expect(emitted).toEqual([]);
   });
 
   it('should handle disabled="" attribute via booleanAttribute', async () => {
@@ -93,10 +100,45 @@ describe('SelectComponent', () => {
     const trigger = fixture.nativeElement.querySelector('.trigger');
     expect(trigger.disabled).toBe(true);
   });
+
+  it('togglePopover is a no-op when disabled', async () => {
+    const f = TestBed.createComponent(SelectComponent);
+    f.componentRef.setInput('disabled', true);
+    let toggleCalled = false;
+    const dropdown = f.nativeElement.querySelector('.dropdown');
+    dropdown.togglePopover = () => {
+      toggleCalled = true;
+    };
+    f.detectChanges();
+    await f.whenStable();
+
+    f.componentInstance.togglePopover();
+    expect(toggleCalled).toBe(false);
+  });
+
+  it('onPopoverToggle sets open signal from ToggleEvent', async () => {
+    const fixture2 = TestBed.createComponent(SelectHostComponent);
+    fixture2.detectChanges();
+    await fixture2.whenStable();
+
+    const select: SelectComponent = fixture2.debugElement.query(
+      By.directive(SelectComponent),
+    ).componentInstance;
+
+    const openEv = new Event('toggle') as ToggleEvent;
+    Object.defineProperty(openEv, 'newState', { value: 'open', configurable: true });
+    select.onPopoverToggle(openEv);
+    expect(select.open()).toBe(true);
+
+    const closedEv = new Event('toggle') as ToggleEvent;
+    Object.defineProperty(closedEv, 'newState', { value: 'closed', configurable: true });
+    select.onPopoverToggle(closedEv);
+    expect(select.open()).toBe(false);
+  });
 });
 
 describe('SelectComponent selection', () => {
-  it('should apply startingValue and mark the option selected', async () => {
+  it('should apply an initially bound value and mark the option selected', async () => {
     const fixture = TestBed.createComponent(SelectHostComponent);
     fixture.detectChanges();
     await fixture.whenStable();
@@ -109,9 +151,9 @@ describe('SelectComponent selection', () => {
     expect(select.options.find(o => o.value() === 'b')?.selected).toBe(true);
   });
 
-  it('should not select a disabled option via startingValue', async () => {
+  it('should not select a disabled option via bound value', async () => {
     const fixture = TestBed.createComponent(SelectHostComponent);
-    fixture.componentInstance.starting = 'c';
+    fixture.componentInstance.starting.set('c');
     fixture.detectChanges();
     await fixture.whenStable();
 
@@ -122,7 +164,7 @@ describe('SelectComponent selection', () => {
     expect(select.triggerText()).toBe('');
   });
 
-  it('should select an enabled option on dropdown click', async () => {
+  it('should select an enabled option on dropdown click and emit once', async () => {
     const fixture = TestBed.createComponent(SelectHostComponent);
     fixture.detectChanges();
     await fixture.whenStable();
@@ -134,16 +176,32 @@ describe('SelectComponent selection', () => {
       By.directive(SelectComponent),
     ).componentInstance;
     const emitted: string[] = [];
-    select.valueChanged.subscribe(v => emitted.push(v));
+    @Component({
+      standalone: true,
+      imports: [SelectComponent, MenuOptionComponent],
+      template: `
+        <k-select (valueChange)="emitted.push($event)">
+          <k-menu-option value="a">Apple</k-menu-option>
+          <k-menu-option value="b">Banana</k-menu-option>
+        </k-select>
+      `,
+    })
+    class EmitHostComponent {
+      emitted = emitted;
+    }
+    const ef = TestBed.createComponent(EmitHostComponent);
+    ef.detectChanges();
+    await ef.whenStable();
+    const eDropdown = ef.nativeElement.querySelector('.dropdown');
+    eDropdown.hidePopover = () => {};
 
-    const optionEls = fixture.nativeElement.querySelectorAll('k-menu-option');
+    const optionEls = ef.nativeElement.querySelectorAll('k-menu-option');
     optionEls[0].dispatchEvent(new MouseEvent('click', { bubbles: true }));
-    fixture.detectChanges();
-    await fixture.whenStable();
+    ef.detectChanges();
+    await ef.whenStable();
 
-    expect(select.value()).toBe('a');
-    expect(select.triggerText()).toBe('Apple');
-    expect(emitted).toContain('a');
+    expect(ef.componentInstance.emitted).toEqual(['a']);
+    expect(ef.componentInstance.emitted).toContain('a');
   });
 
   it('should not select a disabled option on dropdown click', async () => {
@@ -165,6 +223,22 @@ describe('SelectComponent selection', () => {
     expect(select.value()).toBe('b');
   });
 
+  it('should react to late external value changes', async () => {
+    const fixture = TestBed.createComponent(SelectHostComponent);
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    const select: SelectComponent = fixture.debugElement.query(
+      By.directive(SelectComponent),
+    ).componentInstance;
+    fixture.componentInstance.starting.set('a');
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    expect(select.value()).toBe('a');
+    expect(select.triggerText()).toBe('Apple');
+  });
+
   it('togglePopover toggles the dropdown element', async () => {
     const fixture = TestBed.createComponent(SelectHostComponent);
     let toggleCalled = false;
@@ -180,43 +254,5 @@ describe('SelectComponent selection', () => {
     ).componentInstance;
     select.togglePopover();
     expect(toggleCalled).toBe(true);
-  });
-
-  it('togglePopover is a no-op when disabled', async () => {
-    const fixture = TestBed.createComponent(SelectHostComponent);
-    fixture.componentInstance.disabled = true;
-    let toggleCalled = false;
-    const dropdown = fixture.nativeElement.querySelector('.dropdown');
-    dropdown.togglePopover = () => {
-      toggleCalled = true;
-    };
-    fixture.detectChanges();
-    await fixture.whenStable();
-
-    const select: SelectComponent = fixture.debugElement.query(
-      By.directive(SelectComponent),
-    ).componentInstance;
-    select.togglePopover();
-    expect(toggleCalled).toBe(false);
-  });
-
-  it('onPopoverToggle sets open signal from ToggleEvent', async () => {
-    const fixture = TestBed.createComponent(SelectHostComponent);
-    fixture.detectChanges();
-    await fixture.whenStable();
-
-    const select: SelectComponent = fixture.debugElement.query(
-      By.directive(SelectComponent),
-    ).componentInstance;
-
-    const openEv = new Event('toggle') as ToggleEvent;
-    Object.defineProperty(openEv, 'newState', { value: 'open', configurable: true });
-    select.onPopoverToggle(openEv);
-    expect(select.open()).toBe(true);
-
-    const closedEv = new Event('toggle') as ToggleEvent;
-    Object.defineProperty(closedEv, 'newState', { value: 'closed', configurable: true });
-    select.onPopoverToggle(closedEv);
-    expect(select.open()).toBe(false);
   });
 });

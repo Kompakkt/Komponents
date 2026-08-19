@@ -1,5 +1,16 @@
+import { Component, signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { LabelledCheckboxComponent } from './labelled-checkbox.component';
+
+@Component({
+  standalone: true,
+  imports: [LabelledCheckboxComponent],
+  template: `<k-labelled-checkbox [label]="label" [(checked)]="checked" />`,
+})
+class CheckboxHostComponent {
+  label = 'Check me';
+  checked = false;
+}
 
 describe('LabelledCheckboxComponent', () => {
   let fixture: ComponentFixture<LabelledCheckboxComponent>;
@@ -30,59 +41,125 @@ describe('LabelledCheckboxComponent', () => {
     expect(component.checked()).toBe(true);
   });
 
-  it('should emit checkedChange on toggle', async () => {
-    const values: boolean[] = [];
-    component.checkedChange.subscribe(v => values.push(v));
-    const checkbox = fixture.nativeElement.querySelector('input[type="checkbox"]');
-    checkbox.checked = true;
-    checkbox.dispatchEvent(new Event('change'));
+  it('should reflect an initially bound checked value', async () => {
+    fixture = TestBed.createComponent(LabelledCheckboxComponent);
+    component = fixture.componentInstance;
+    fixture.componentRef.setInput('label', 'Pre-checked');
+    fixture.componentRef.setInput('checked', true);
     fixture.detectChanges();
     await fixture.whenStable();
-    expect(values.includes(true)).toBe(true);
+    expect(component.checked()).toBe(true);
   });
 
-  it('should react to late startingValue changes', async () => {
-    fixture.componentRef.setInput('startingValue', true);
+  it('should react to late external checked changes', async () => {
+    fixture.componentRef.setInput('checked', true);
     fixture.detectChanges();
     await fixture.whenStable();
-    fixture.componentRef.setInput('startingValue', false);
+    expect(component.checked()).toBe(true);
+    fixture.componentRef.setInput('checked', false);
     fixture.detectChanges();
     await fixture.whenStable();
     expect(component.checked()).toBe(false);
   });
+});
 
-  it('should emit initial value on initialization (effect-driven)', () => {
-    const f = TestBed.createComponent(LabelledCheckboxComponent);
-    f.componentRef.setInput('label', 'Test');
-    const values: boolean[] = [];
-    f.componentInstance.checkedChange.subscribe(v => values.push(v));
+describe('LabelledCheckboxComponent with host bindings', () => {
+  let fixture: ComponentFixture<CheckboxHostComponent>;
+  let host: CheckboxHostComponent;
+
+  beforeEach(async () => {
+    fixture = TestBed.createComponent(CheckboxHostComponent);
+    host = fixture.componentInstance;
+    fixture.detectChanges();
+    await fixture.whenStable();
+  });
+
+  function getCheckbox() {
+    return fixture.nativeElement.querySelector('input[type="checkbox"]');
+  }
+
+  it('should not emit checkedChange during initialization', async () => {
+    const emitted: boolean[] = [];
+    // Re-create with a spy on the two-way bound field via (checkedChange)
+    @Component({
+      standalone: true,
+      imports: [LabelledCheckboxComponent],
+      template: `<k-labelled-checkbox [label]="'Test'" (checkedChange)="emitted.push($event)" />`,
+    })
+    class EmitHostComponent {
+      emitted = emitted;
+    }
+    const f = TestBed.createComponent(EmitHostComponent);
     f.detectChanges();
-    expect(values).toEqual([false]);
+    await f.whenStable();
+    expect(emitted).toEqual([]);
+  });
+
+  it('should emit exactly once per toggle (no revert)', async () => {
+    const emitted: boolean[] = [];
+    @Component({
+      standalone: true,
+      imports: [LabelledCheckboxComponent],
+      template: `<k-labelled-checkbox [label]="'Test'" (checkedChange)="emitted.push($event)" />`,
+    })
+    class EmitHostComponent {
+      emitted = emitted;
+    }
+    const f = TestBed.createComponent(EmitHostComponent);
+    f.detectChanges();
+    await f.whenStable();
+
+    const checkbox = f.nativeElement.querySelector('input[type="checkbox"]');
+    checkbox.checked = true;
+    checkbox.dispatchEvent(new Event('change'));
+    f.detectChanges();
+    await f.whenStable();
+
+    expect(emitted).toEqual([true]);
+    expect(f.componentInstance.emitted).toEqual([true]);
   });
 
   it('should emit correct values on sequential toggles', async () => {
-    const values: boolean[] = [];
-    component.checkedChange.subscribe(v => values.push(v));
-    const checkbox = fixture.nativeElement.querySelector('input[type="checkbox"]');
+    const checkbox = getCheckbox();
     checkbox.checked = true;
     checkbox.dispatchEvent(new Event('change'));
     fixture.detectChanges();
     await fixture.whenStable();
+    expect(host.checked).toBe(true);
+
     checkbox.checked = false;
     checkbox.dispatchEvent(new Event('change'));
     fixture.detectChanges();
     await fixture.whenStable();
-    expect(values[values.length - 2]).toBe(true);
-    expect(values[values.length - 1]).toBe(false);
+    expect(host.checked).toBe(false);
   });
 
-  it('should reflect startingValue', async () => {
-    fixture = TestBed.createComponent(LabelledCheckboxComponent);
-    component = fixture.componentInstance;
-    fixture.componentRef.setInput('label', 'Pre-checked');
-    fixture.componentRef.setInput('startingValue', true);
+  it('should update the two-way bound host field and stay checked', async () => {
+    const checkbox = getCheckbox();
+    checkbox.checked = true;
+    checkbox.dispatchEvent(new Event('change'));
     fixture.detectChanges();
     await fixture.whenStable();
-    expect(component.checked()).toBe(true);
+    expect(host.checked).toBe(true);
+    expect(checkbox.checked).toBe(true);
+  });
+
+  it('should reflect late external value changes in one-way binding', async () => {
+    @Component({
+      standalone: true,
+      imports: [LabelledCheckboxComponent],
+      template: `<k-labelled-checkbox [label]="'Test'" [checked]="checked()" />`,
+    })
+    class OneWayHostComponent {
+      checked = signal(false);
+    }
+    const f = TestBed.createComponent(OneWayHostComponent);
+    f.detectChanges();
+    await f.whenStable();
+
+    f.componentInstance.checked.set(true);
+    f.detectChanges();
+    await f.whenStable();
+    expect(f.nativeElement.querySelector('input[type="checkbox"]').checked).toBe(true);
   });
 });

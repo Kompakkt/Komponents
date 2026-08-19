@@ -4,11 +4,9 @@ import {
   DestroyRef,
   ElementRef,
   computed,
-  effect,
   inject,
   input,
-  output,
-  signal,
+  model,
   viewChild,
 } from '@angular/core';
 
@@ -28,14 +26,10 @@ export class SliderComponent implements AfterViewInit {
   label = input.required<string>();
   min = input(0);
   max = input(100);
-  startingValue = input(0);
   showLabel = input(true);
   step = input(0.1);
-  value = signal(0);
-  valueChanged = output<number>();
+  value = model(0);
   direction = input<'left-to-right' | 'bottom-to-top'>('left-to-right');
-
-  startingValueChangedEffect = effect(() => this.value.set(this.startingValue() ?? ''));
 
   showInfo = input(true);
   showTooltip = input(true);
@@ -48,12 +42,6 @@ export class SliderComponent implements AfterViewInit {
   handlePosition = computed(() => {
     return ((this.value() - this.min()) / (this.max() - this.min())) * 100;
   });
-
-  constructor() {
-    effect(() => {
-      this.valueChanged.emit(this.value());
-    });
-  }
 
   #destroyRef = inject(DestroyRef);
 

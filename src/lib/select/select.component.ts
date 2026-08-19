@@ -7,8 +7,8 @@ import {
   ElementRef,
   inject,
   input,
+  model,
   OnDestroy,
-  output,
   QueryList,
   signal,
   viewChild,
@@ -28,10 +28,8 @@ export class SelectComponent implements AfterContentInit, OnDestroy {
   label = input<string>();
   placeholder = input<string>('Select...');
   disabled = input(false, { transform: booleanAttribute });
-  startingValue = input<string>();
 
-  value = signal<string>('');
-  valueChanged = output<string>();
+  value = model<string>('');
 
   open = signal(false);
   triggerText = signal<string>('');
@@ -46,11 +44,9 @@ export class SelectComponent implements AfterContentInit, OnDestroy {
 
   constructor() {
     effect(() => {
-      this.valueChanged.emit(this.value());
-    });
-    effect(() => {
-      const sv = this.startingValue();
-      if (sv !== undefined) this.#applyValue(sv);
+      const value = this.value();
+      if (!value) return;
+      this.#applyValue(value);
     });
     effect(onCleanup => {
       void this.triggerText();
@@ -62,7 +58,7 @@ export class SelectComponent implements AfterContentInit, OnDestroy {
 
   ngAfterContentInit(): void {
     this.#setupAnchor();
-    this.#syncFromStartingValue();
+    this.#syncFromBoundValue();
     this.#watchOptions();
   }
 
@@ -89,7 +85,10 @@ export class SelectComponent implements AfterContentInit, OnDestroy {
   #applyValue(optionValue: string): void {
     if (!this.options?.length) return;
     const option = this.options.find(o => o.value() === optionValue);
-    if (!option || option.isDisabled) return;
+    if (!option || option.isDisabled) {
+      this.value.set('');
+      return;
+    }
     this.value.set(optionValue);
     this.triggerText.set(option.elementRef.nativeElement.textContent?.trim() ?? '');
     this.options.forEach(o => (o.selected = o.value() === optionValue));
@@ -116,15 +115,15 @@ export class SelectComponent implements AfterContentInit, OnDestroy {
     (dd.style as unknown as Record<string, string>)['positionAnchor'] = anchorName;
   }
 
-  #syncFromStartingValue(): void {
-    const sv = this.startingValue();
-    if (!sv) return;
-    this.#applyValue(sv);
+  #syncFromBoundValue(): void {
+    const value = this.value();
+    if (!value) return;
+    this.#applyValue(value);
   }
 
   #watchOptions(): void {
     this.#optionsSub = this.options.changes.subscribe(() => {
-      this.#syncFromStartingValue();
+      this.#syncFromBoundValue();
     });
   }
 }

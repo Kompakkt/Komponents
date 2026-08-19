@@ -1,4 +1,4 @@
-import { Component, HostBinding, effect, input, output, signal } from '@angular/core';
+import { Component, HostBinding, input, model } from '@angular/core';
 
 @Component({
   selector: 'k-slide-toggle',
@@ -9,15 +9,10 @@ import { Component, HostBinding, effect, input, output, signal } from '@angular/
 })
 export class SlideToggleComponent {
   label = input.required<string>();
-  startingValue = input<boolean>(false);
-  checkedChange = output<boolean>();
-  checked = signal(false);
-  #sync = effect(() => this.checked.set(this.startingValue()));
+  checked = model(false);
 
   toggle() {
-    const next = !this.checked();
-    this.checked.set(next);
-    this.checkedChange.emit(next);
+    this.checked.set(!this.checked());
   }
 
   @HostBinding('class.active')
