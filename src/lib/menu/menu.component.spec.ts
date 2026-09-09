@@ -52,7 +52,7 @@ describe('MenuComponent', () => {
   standalone: true,
   imports: [MenuComponent, MenuOptionComponent],
   template: `
-    <div class="anchor">
+    <div class="anchor" tabindex="-1">
       <k-menu label="Actions">
         <k-menu-option value="edit">Edit</k-menu-option>
       </k-menu>
@@ -120,23 +120,23 @@ describe('MenuComponent interactions', () => {
     expect(getOpen()).toBe(false);
   });
 
-  it('hides when mouse leaves parent toward the popover', () => {
+  it('stays open when mouse moves from parent into the popover', () => {
     const { fixture, menuEl, setOpen, getOpen } = setup();
     setOpen(true);
     const ev = new MouseEvent('mouseleave');
     Object.defineProperty(ev, 'relatedTarget', { value: menuEl });
     fixture.nativeElement.querySelector('.anchor').dispatchEvent(ev);
-    expect(getOpen()).toBe(false);
+    expect(getOpen()).toBe(true);
   });
 
-  it('hides when mouse leaves popover toward the anchor', () => {
+  it('stays open when mouse moves from popover to the anchor', () => {
     const { fixture, menuEl, setOpen, getOpen } = setup();
     setOpen(true);
     const anchor = fixture.nativeElement.querySelector('.anchor');
     const ev = new MouseEvent('mouseleave');
     Object.defineProperty(ev, 'relatedTarget', { value: anchor });
     menuEl.dispatchEvent(ev);
-    expect(getOpen()).toBe(false);
+    expect(getOpen()).toBe(true);
   });
 
   it('hides when mouse leaves popover to outside', () => {
@@ -146,5 +146,55 @@ describe('MenuComponent interactions', () => {
     Object.defineProperty(ev, 'relatedTarget', { value: document.body });
     menuEl.dispatchEvent(ev);
     expect(getOpen()).toBe(false);
+  });
+
+  it('disables pointer events and closes state when popover is dismissed natively', () => {
+    const { fixture, menuEl, setOpen } = setup();
+    setOpen(true);
+    const ev = new Event('beforetoggle');
+    Object.defineProperty(ev, 'oldState', { value: 'open' });
+    Object.defineProperty(ev, 'newState', { value: 'closed' });
+    menuEl.dispatchEvent(ev);
+    setOpen(false);
+    menuEl.dispatchEvent(new Event('transitionend'));
+    expect(menuEl.style.pointerEvents).toBe('none');
+    fixture.detectChanges();
+    expect(menuEl.classList.contains('opened')).toBe(false);
+  });
+
+  it('stays open when focus is inside the menu and the mouse leaves', () => {
+    const { fixture, menuEl, setOpen, getOpen } = setup();
+    setOpen(true);
+    const prev = document.activeElement;
+    Object.defineProperty(document, 'activeElement', { value: menuEl, configurable: true });
+    try {
+      const ev = new MouseEvent('mouseleave');
+      Object.defineProperty(ev, 'relatedTarget', { value: document.body });
+      menuEl.dispatchEvent(ev);
+      expect(getOpen()).toBe(true);
+    } finally {
+      Object.defineProperty(document, 'activeElement', { value: prev, configurable: true });
+    }
+  });
+
+  it('hides on mouseleave when the anchor is focused', () => {
+    const { fixture, menuEl, setOpen, getOpen } = setup();
+    setOpen(true);
+    const anchor = fixture.nativeElement.querySelector('.anchor');
+    anchor.focus();
+    const ev = new MouseEvent('mouseleave');
+    Object.defineProperty(ev, 'relatedTarget', { value: document.body });
+    anchor.dispatchEvent(ev);
+    expect(getOpen()).toBe(false);
+  });
+
+  it('enables pointer events after the opening transition', () => {
+    const { fixture, menuEl } = setup();
+    fixture.nativeElement.querySelector('.anchor').dispatchEvent(new Event('mouseenter'));
+    expect(menuEl.style.pointerEvents).toBe('none');
+    menuEl.dispatchEvent(new Event('transitionend'));
+    expect(menuEl.style.pointerEvents).toBe('auto');
+    fixture.detectChanges();
+    expect(menuEl.classList.contains('opened')).toBe(true);
   });
 });

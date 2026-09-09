@@ -49,6 +49,10 @@
   &::backdrop {
     background: transparent;
   }
+
+  &:not(.opened) {
+    max-height: 0px;
+  }
 }
 
 .k-menu-options {
