@@ -198,3 +198,92 @@ describe('MenuComponent interactions', () => {
     expect(menuEl.classList.contains('opened')).toBe(true);
   });
 });
+
+@Component({
+  standalone: true,
+  imports: [MenuComponent, MenuOptionComponent],
+  template: `
+    <div class="anchor" tabindex="-1">
+      <k-menu label="Actions" trigger="click">
+        <k-menu-option value="edit">Edit</k-menu-option>
+      </k-menu>
+    </div>
+  `,
+})
+class MenuClickHostComponent {}
+
+describe('MenuComponent click trigger', () => {
+  function setup() {
+    (HTMLElement.prototype as any).showPopover = () => {};
+    (HTMLElement.prototype as any).hidePopover = () => {};
+    const fixture = TestBed.createComponent(MenuClickHostComponent);
+    const menuEl = fixture.nativeElement.querySelector('k-menu');
+    let popoverOpen = false;
+    menuEl.showPopover = () => {
+      popoverOpen = true;
+    };
+    menuEl.hidePopover = () => {
+      popoverOpen = false;
+    };
+    const realMatches = menuEl.matches.bind(menuEl);
+    menuEl.matches = (sel: string) => (sel === ':popover-open' ? popoverOpen : realMatches(sel));
+    fixture.detectChanges();
+    return {
+      fixture,
+      menuEl,
+      getOpen: () => popoverOpen,
+      setOpen: (v: boolean) => {
+        popoverOpen = v;
+      },
+    };
+  }
+
+  afterEach(() => {
+    delete (HTMLElement.prototype as any).showPopover;
+    delete (HTMLElement.prototype as any).hidePopover;
+  });
+
+  it('does not open on parent mouseenter', () => {
+    const { fixture, getOpen } = setup();
+    fixture.nativeElement.querySelector('.anchor').dispatchEvent(new Event('mouseenter'));
+    expect(getOpen()).toBe(false);
+  });
+
+  it('opens on anchor click', () => {
+    const { fixture, getOpen } = setup();
+    const anchor = fixture.nativeElement.querySelector('.anchor');
+    anchor.dispatchEvent(new MouseEvent('pointerdown'));
+    anchor.dispatchEvent(new MouseEvent('click', { detail: 1 }));
+    expect(getOpen()).toBe(true);
+  });
+
+  it('closes on a second anchor click', () => {
+    const { fixture, getOpen } = setup();
+    const anchor = fixture.nativeElement.querySelector('.anchor');
+    anchor.dispatchEvent(new MouseEvent('pointerdown'));
+    anchor.dispatchEvent(new MouseEvent('click', { detail: 1 }));
+    expect(getOpen()).toBe(true);
+    anchor.dispatchEvent(new MouseEvent('pointerdown'));
+    anchor.dispatchEvent(new MouseEvent('click', { detail: 1 }));
+    expect(getOpen()).toBe(false);
+  });
+
+  it('toggles on keyboard activation (click without a pointerdown)', () => {
+    const { fixture, getOpen } = setup();
+    const anchor = fixture.nativeElement.querySelector('.anchor');
+    anchor.dispatchEvent(new MouseEvent('click', { detail: 0 }));
+    expect(getOpen()).toBe(true);
+    anchor.dispatchEvent(new MouseEvent('click', { detail: 0 }));
+    expect(getOpen()).toBe(false);
+  });
+
+  it('stays closed when the click follows a native light dismiss', () => {
+    const { fixture, getOpen, setOpen } = setup();
+    const anchor = fixture.nativeElement.querySelector('.anchor');
+    setOpen(true);
+    anchor.dispatchEvent(new MouseEvent('pointerdown'));
+    setOpen(false);
+    anchor.dispatchEvent(new MouseEvent('click', { detail: 1 }));
+    expect(getOpen()).toBe(false);
+  });
+});

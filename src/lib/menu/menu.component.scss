@@ -1,5 +1,4 @@
 :host {
-  display: flex;
   cursor: default;
   flex-direction: column;
   background-color: var(--color-gray-dark);
@@ -20,8 +19,9 @@
     flip-block flip-inline;
   inset: unset;
 
-  // Popover API styles
+  // Popover API styles: display only while open, so the UA popover rule hides the closed menu.
   &:popover-open {
+    display: flex;
     opacity: 1;
     transform: translateY(0);
   }
@@ -48,10 +48,6 @@
   // Override default popover backdrop
   &::backdrop {
     background: transparent;
-  }
-
-  &:not(.opened) {
-    max-height: 0px;
   }
 }
 
