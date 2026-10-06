@@ -10,6 +10,7 @@ import { DetailsComponent } from '@kompakkt/komponents';
 })
 export class ExampleDetailsComponent {
   stressCount = signal(0);
+  controlledExpanded = signal(true);
 
   setStressCount(count: number) {
     this.stressCount.set(count);

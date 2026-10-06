@@ -12,6 +12,17 @@
   <p>Details Content</p>
 </k-details>
 
+<h2>Details — header actions &amp; controlled expansion</h2>
+<k-details
+  title="Controlled details"
+  [expanded]="controlledExpanded()"
+  (expandedChange)="controlledExpanded.set($event)"
+>
+  <button details-actions (click)="$event.stopPropagation()">Action</button>
+  <p>Content</p>
+</k-details>
+<button (click)="controlledExpanded.set(!controlledExpanded())">Toggle from outside</button>
+
 <h2>Details — long title (truncated, default)</h2>
 <div style="max-width: 200px">
   <k-details

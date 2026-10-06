@@ -16,6 +16,9 @@
   <span class="title-viewport">
     <span #titleEl [class.marquee-enabled]="marquee()">{{ title() }}</span>
   </span>
+  <span class="details-actions">
+    <ng-content select="[details-actions]" />
+  </span>
 </div>
 
 <div class="details-content-wrapper" [class.opened]="expanded()">

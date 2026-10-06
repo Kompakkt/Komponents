@@ -6,7 +6,7 @@ import {
   ElementRef,
   inject,
   input,
-  signal,
+  model,
   viewChild,
 } from '@angular/core';
 import { setupMarquee } from '../shared/marquee';
@@ -22,7 +22,7 @@ export class DetailsComponent implements AfterViewInit {
   startCollapsed = input(false);
   alwaysExpanded = input(false);
   marquee = input(false);
-  expanded = signal(true);
+  expanded = model(true);
   gap = input(8);
 
   titleEl = viewChild<ElementRef<HTMLSpanElement>>('titleEl');

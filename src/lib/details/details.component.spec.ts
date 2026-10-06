@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { Component, signal } from '@angular/core';
 import { DetailsComponent } from './details.component';
 
 describe('DetailsComponent', () => {
@@ -18,7 +19,7 @@ describe('DetailsComponent', () => {
   });
 
   it('should display the title', () => {
-    const titleEl = fixture.nativeElement.querySelector('.details-header span:last-child');
+    const titleEl = fixture.nativeElement.querySelector('.title-viewport span');
     expect(titleEl.textContent).toContain('Test Title');
   });
 
@@ -84,5 +85,60 @@ describe('DetailsComponent', () => {
 
     const span = fixture.nativeElement.querySelector('.title-viewport span');
     expect(span.style.getPropertyValue('--marquee-distance')).toBe('');
+  });
+});
+
+@Component({
+  standalone: true,
+  imports: [DetailsComponent],
+  template: `
+    <k-details title="Host" [expanded]="expanded()" (expandedChange)="setExpanded($event)">
+      <button details-actions type="button">Del</button>
+      <span class="body">Body</span>
+    </k-details>
+  `,
+})
+class DetailsHostComponent {
+  expanded = signal(true);
+  setExpanded(value: boolean) {
+    this.expanded.set(value);
+  }
+}
+
+describe('DetailsComponent header actions and controlled expansion', () => {
+  it('projects header actions into the header', async () => {
+    const fixture = TestBed.createComponent(DetailsHostComponent);
+    fixture.detectChanges();
+    await fixture.whenStable();
+    const action = fixture.nativeElement.querySelector('.details-actions button');
+    expect(action?.textContent).toContain('Del');
+  });
+
+  it('does not put header actions into the body', async () => {
+    const fixture = TestBed.createComponent(DetailsHostComponent);
+    fixture.detectChanges();
+    await fixture.whenStable();
+    expect(fixture.nativeElement.querySelector('.details-content button')).toBeNull();
+    expect(fixture.nativeElement.querySelector('.details-content .body')).toBeTruthy();
+  });
+
+  it('emits expandedChange when the header is toggled', async () => {
+    const fixture = TestBed.createComponent(DetailsHostComponent);
+    fixture.detectChanges();
+    await fixture.whenStable();
+    fixture.nativeElement.querySelector('.details-header').click();
+    fixture.detectChanges();
+    expect(fixture.componentInstance.expanded()).toBe(false);
+  });
+
+  it('reflects a controlled expanded input', async () => {
+    const fixture = TestBed.createComponent(DetailsHostComponent);
+    fixture.detectChanges();
+    await fixture.whenStable();
+    fixture.componentInstance.expanded.set(false);
+    fixture.detectChanges();
+    expect(
+      fixture.nativeElement.querySelector('.details-content-wrapper')?.classList.contains('opened'),
+    ).toBe(false);
   });
 });

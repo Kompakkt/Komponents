@@ -67,6 +67,12 @@
       transform: translateX(0);
       transition: transform 0.3s ease;
     }
+
+    > .details-actions {
+      display: flex;
+      align-items: center;
+      flex: 0 0 auto;
+    }
   }
 
   @keyframes k-details-marquee {
