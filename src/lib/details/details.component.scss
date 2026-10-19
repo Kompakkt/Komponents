@@ -10,6 +10,16 @@
   --transition-duration: 300ms;
   --transition-easing: cubic-bezier(0.76, 0, 0.24, 1);
 
+  &.size-sm > .details-header {
+    min-height: 24px;
+    padding: 8px;
+  }
+
+  &.size-lg > .details-header {
+    min-height: 40px;
+    padding: 16px;
+  }
+
   > .details-header {
     min-height: 32px;
     padding: 12px;

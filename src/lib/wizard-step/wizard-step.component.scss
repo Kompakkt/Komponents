@@ -49,6 +49,16 @@
     background-color: rgba(255, 255, 255, 0.1);
   }
 
+  :host(.size-sm) & {
+    min-height: 24px;
+    padding: 8px;
+  }
+
+  :host(.size-lg) & {
+    min-height: 40px;
+    padding: 16px;
+  }
+
   div.wizard-step-counter {
     width: 24px;
     height: 24px;

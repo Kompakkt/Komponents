@@ -16,9 +16,11 @@ import { setupMarquee } from '../shared/marquee';
   standalone: true,
   templateUrl: './details.component.html',
   styleUrl: './details.component.scss',
+  host: { '[class]': '"size-" + size()' },
 })
 export class DetailsComponent implements AfterViewInit {
   title = input.required<string>();
+  size = input<'sm' | 'md' | 'lg'>('md');
   startCollapsed = input(false);
   alwaysExpanded = input(false);
   marquee = input(false);

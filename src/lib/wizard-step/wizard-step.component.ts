@@ -14,9 +14,11 @@ import {
   imports: [],
   templateUrl: './wizard-step.component.html',
   styleUrl: './wizard-step.component.scss',
+  host: { '[class]': '"size-" + size()' },
 })
 export class WizardStepComponent {
   label = input.required<string>();
+  size = input<'sm' | 'md' | 'lg'>('md');
   active = signal(false);
   completed = signal(false);
   counter = signal(0);

@@ -6,10 +6,12 @@ import { Component, ElementRef, HostBinding, input, model, viewChild } from '@an
   imports: [],
   templateUrl: './textarea.component.html',
   styleUrl: './textarea.component.scss',
+  host: { '[class]': '"size-" + size()' },
 })
 export class TextareaComponent {
   textarea = viewChild.required<ElementRef<HTMLTextAreaElement>>('textarea');
 
+  size = input<'sm' | 'md' | 'lg'>('md');
   label = input.required<string>();
   placeholder = input('');
 

@@ -6,10 +6,12 @@ import { Component, ElementRef, HostBinding, inject, input } from '@angular/core
   imports: [],
   templateUrl: './menu-option.component.html',
   styleUrl: './menu-option.component.scss',
+  host: { '[class]': '"size-" + size()' },
 })
 export class MenuOptionComponent {
   disabled = input<string | undefined>();
   value = input<string>();
+  size = input<'sm' | 'md' | 'lg'>('md');
   selected = false;
 
   elementRef = inject<ElementRef<HTMLElement>>(ElementRef);

@@ -11,6 +11,16 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 
+  &.size-sm {
+    height: 28px;
+    padding: 0 6px;
+  }
+
+  &.size-lg {
+    height: 44px;
+    padding: 0 12px;
+  }
+
   &:not(.disabled) {
     &:hover,
     &:focus,

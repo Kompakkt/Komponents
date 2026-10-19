@@ -8,8 +8,10 @@ export type InputType = 'text' | 'number' | 'username' | 'password' | 'email' | 
   imports: [],
   templateUrl: './input.component.html',
   styleUrl: './input.component.scss',
+  host: { '[class]': '"size-" + size()' },
 })
 export class InputComponent {
+  size = input<'sm' | 'md' | 'lg'>('md');
   min = input<number>(0);
   max = input<number>(100);
 

@@ -15,6 +15,14 @@
     color: inherit;
   }
 
+  &.size-sm button.trigger {
+    padding: 3px 6px;
+  }
+
+  &.size-lg button.trigger {
+    padding: 8px 10px;
+  }
+
   button.trigger {
     display: flex;
     align-items: center;

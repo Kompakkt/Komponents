@@ -23,9 +23,11 @@ import { setupMarquee } from '../shared/marquee';
   imports: [],
   templateUrl: './select.component.html',
   styleUrl: './select.component.scss',
+  host: { '[class]': '"size-" + size()' },
 })
 export class SelectComponent implements AfterContentInit, OnDestroy {
   label = input<string>();
+  size = input<'sm' | 'md' | 'lg'>('md');
   placeholder = input<string>('Select...');
   disabled = input(false, { transform: booleanAttribute });
 

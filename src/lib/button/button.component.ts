@@ -40,9 +40,11 @@ type ButtonType = `${ButtonStyle}-${ButtonColor}`;
   standalone: true,
   templateUrl: './button.component.html',
   styleUrl: './button.component.scss',
+  host: { '[class]': '"size-" + size()' },
 })
 export class ButtonComponent {
   type = input<ButtonType>('solid-transparent');
+  size = input<'sm' | 'md' | 'lg'>('md');
   disabled = input(false, { transform: booleanAttribute });
   iconButton = input<string | undefined>(undefined, { alias: 'icon-button' });
   iconSize = input<number | undefined>(undefined, { alias: 'icon-size' });
