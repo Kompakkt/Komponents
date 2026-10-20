@@ -1,7 +1,7 @@
 @if (label(); as label) {
   <span class="label">{{ label }}</span>
 }
-<button class="trigger" type="button" (click)="togglePopover()" [disabled]="disabled()">
+<button class="trigger" type="button" [disabled]="disabled()">
   <span class="trigger-viewport">
     <span #triggerTextEl class="trigger-text">{{ triggerText() || placeholder() }}</span>
   </span>

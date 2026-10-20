@@ -9,7 +9,7 @@ import { InputComponent } from '../input/input.component';
   styleUrl: './autocomplete.component.scss',
   host: {
     'style.--max-height': 'maxHeightStyle()',
-  }
+  },
 })
 export class AutocompleteComponent {
   maxHeight = input<string | number>(240, { alias: 'max-height' });

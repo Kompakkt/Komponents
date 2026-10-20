@@ -68,11 +68,6 @@ export class SelectComponent implements AfterContentInit, OnDestroy {
     this.#optionsSub?.unsubscribe();
   }
 
-  togglePopover(): void {
-    if (this.disabled()) return;
-    this.dropdown()?.nativeElement.togglePopover();
-  }
-
   onPopoverToggle(event: Event): void {
     this.open.set((event as ToggleEvent).newState === 'open');
   }
@@ -112,6 +107,7 @@ export class SelectComponent implements AfterContentInit, OnDestroy {
     if (!dd) return;
     const id = `k-select-${crypto.randomUUID()}`;
     dd.id = id;
+    trigger.setAttribute('popovertarget', id);
     const anchorName = `--anchor-${id}`;
     (trigger.style as unknown as Record<string, string>)['anchorName'] = anchorName;
     (dd.style as unknown as Record<string, string>)['positionAnchor'] = anchorName;
