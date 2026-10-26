@@ -122,6 +122,8 @@
   }
 
   .details-content-wrapper:not(.opened) .details-content {
+    padding-top: 0px;
+    padding-bottom: 0px;
     &::before,
     &::after {
       height: 0px;
