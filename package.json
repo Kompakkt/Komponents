@@ -6,8 +6,9 @@
     "start": "ng serve test-page",
     "lint": "oxlint",
     "lint:fix": "oxlint --fix",
-    "format": "oxfmt",
-    "format:check": "oxfmt --check",
+    "format": "bun fmt",
+    "format:check": "bun fmt --check",
+    "check": "bun check",
     "test": "ng test",
     "test:ci": "ng test --no-watch --no-progress --coverage"
   },
@@ -30,7 +31,6 @@
     "@angular/compiler-cli": "21.2.6",
     "@vitest/coverage-v8": "^4.1.10",
     "ng-packagr": "^21.2.2",
-    "oxfmt": "^0.43.0",
     "oxlint": "^1.58.0",
     "oxlint-tsgolint": "^0.19.0",
     "typescript": "~5.9.3"
