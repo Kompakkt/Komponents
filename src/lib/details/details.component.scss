@@ -115,8 +115,10 @@
       max-height var(--transition-duration) var(--transition-easing),
       padding var(--transition-duration) var(--transition-easing);
 
-    padding-left: 16px;
-    padding-right: 16px;
+    padding-top: var(--content-padding-top);
+    padding-left: var(--content-padding-left);
+    padding-right: var(--content-padding-right);
+    padding-bottom: var(--content-padding-bottom);
   }
 
   .details-content-wrapper:not(.opened) .details-content {

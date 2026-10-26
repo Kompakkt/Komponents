@@ -1,5 +1,6 @@
 export * from './lib/button-row/button-row.component';
 export * from './lib/button/button.component';
+export * from './lib/shared/komponents-config';
 export * from './lib/details/details.component';
 export * from './lib/input/input.component';
 export * from './lib/labelled-checkbox/labelled-checkbox.component';
