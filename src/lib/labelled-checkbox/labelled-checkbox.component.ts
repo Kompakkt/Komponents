@@ -9,5 +9,6 @@ import { Component, input, model } from '@angular/core';
 })
 export class LabelledCheckboxComponent {
   label = input.required<string>();
+  disabled = input(false);
   checked = model(false);
 }
