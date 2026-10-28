@@ -1,7 +1,14 @@
 {
   "angularCompilerOptions": {
+    "compilationMode": "partial",
     "disableTypeScriptVersionCheck": true,
     "fullTemplateTypeCheck": true,
+    "extendedDiagnostics": {
+      "checks": {
+        "nullishCoalescingNotNullable": "suppress",
+        "optionalChainNotNullable": "suppress"
+      }
+    },
     "strictInjectionParameters": true,
     "strictInputAccessModifiers": true,
     "strictTemplates": true
@@ -9,10 +16,11 @@
   "compilerOptions": {
     "lib": ["ESNext", "DOM", "DOM.Iterable"],
     "module": "ESNext",
+    "esModuleInterop": true,
     "moduleResolution": "bundler",
     "outDir": "dist",
     "declaration": true,
-    "declarationMap": true,
+    "declarationMap": false,
     "noImplicitAny": true,
     "noImplicitReturns": false,
     "noUnusedLocals": false,

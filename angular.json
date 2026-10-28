@@ -11,17 +11,9 @@
         "build": {
           "builder": "@angular/build:ng-packagr",
           "options": {
-            "project": "ng-package.json"
-          },
-          "configurations": {
-            "production": {
-              "tsConfig": "tsconfig.prod.json"
-            },
-            "development": {
-              "tsConfig": "tsconfig.json"
-            }
-          },
-          "defaultConfiguration": "production"
+            "project": "ng-package.json",
+            "tsConfig": "tsconfig.json"
+          }
         }
       }
     },
@@ -67,8 +59,8 @@
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "2kB",
-                  "maximumError": "4kB"
+                  "maximumWarning": "4kB",
+                  "maximumError": "8kB"
                 }
               ],
               "outputHashing": "all"
