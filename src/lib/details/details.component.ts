@@ -18,11 +18,10 @@ const DEFAULT_PADDING: BoxPadding = {
   left: 16,
   right: 16,
   bottom: 12,
-}
+};
 
 @Component({
   selector: 'k-details',
-  standalone: true,
   templateUrl: './details.component.html',
   styleUrl: './details.component.scss',
   host: {

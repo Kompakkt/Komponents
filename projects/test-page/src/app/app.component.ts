@@ -20,7 +20,6 @@ import ExampleExternalStateComponentTemplate from './examples/external-state/ext
 
 @Component({
   selector: 'app-root',
-  standalone: true,
   imports: [
     ExampleMenuComponent,
     ExampleButtonsComponent,

@@ -14,7 +14,6 @@ import { WizardStepComponent } from '../wizard-step/wizard-step.component';
 @Component({
   selector: 'k-wizard',
   imports: [],
-  standalone: true,
   templateUrl: './wizard.component.html',
   styleUrl: './wizard.component.scss',
 })

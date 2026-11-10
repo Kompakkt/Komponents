@@ -19,7 +19,6 @@ import { setupMarquee } from '../shared/marquee';
 
 @Component({
   selector: 'k-select',
-  standalone: true,
   imports: [],
   templateUrl: './select.component.html',
   styleUrl: './select.component.scss',

@@ -3,7 +3,6 @@ import { ButtonComponent, ButtonRowComponent, TooltipDirective } from '@kompakkt
 
 @Component({
   selector: 'example-tooltip',
-  standalone: true,
   imports: [TooltipDirective, ButtonComponent, ButtonRowComponent],
   templateUrl: './tooltip.component.html',
   styleUrl: './tooltip.component.scss',

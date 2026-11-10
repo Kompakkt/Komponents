@@ -13,7 +13,6 @@ import { MenuOptionComponent } from '../menu-option/menu-option.component';
 
 @Component({
   selector: 'k-menu',
-  standalone: true,
   imports: [MenuOptionComponent],
   templateUrl: './menu.component.html',
   styleUrl: './menu.component.scss',

@@ -37,7 +37,6 @@ type ButtonType = `${ButtonStyle}-${ButtonColor}`;
 
 @Component({
   selector: 'k-button',
-  standalone: true,
   templateUrl: './button.component.html',
   styleUrl: './button.component.scss',
   host: { '[class]': '"size-" + size()' },

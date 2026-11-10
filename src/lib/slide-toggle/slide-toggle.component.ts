@@ -2,7 +2,6 @@ import { Component, HostBinding, input, model } from '@angular/core';
 
 @Component({
   selector: 'k-slide-toggle',
-  standalone: true,
   imports: [],
   templateUrl: './slide-toggle.component.html',
   styleUrl: './slide-toggle.component.scss',

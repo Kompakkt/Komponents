@@ -9,7 +9,6 @@ import {
 
 @Component({
   selector: 'example-input-elements',
-  standalone: true,
   imports: [
     InputComponent,
     TextareaComponent,

@@ -3,7 +3,6 @@ import { ButtonComponent, ButtonRowComponent } from '@kompakkt/komponents';
 
 @Component({
   selector: 'example-buttons',
-  standalone: true,
   imports: [ButtonComponent, ButtonRowComponent],
   templateUrl: './buttons.component.html',
   styleUrl: './buttons.component.scss',

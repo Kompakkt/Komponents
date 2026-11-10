@@ -12,7 +12,6 @@ import {
 
 @Component({
   selector: 'k-slider',
-  standalone: true,
   imports: [],
   templateUrl: './slider.component.html',
   styleUrl: './slider.component.scss',

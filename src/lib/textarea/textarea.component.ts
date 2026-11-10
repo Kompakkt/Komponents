@@ -2,7 +2,6 @@ import { Component, ElementRef, HostBinding, input, model, viewChild } from '@an
 
 @Component({
   selector: 'k-textarea',
-  standalone: true,
   imports: [],
   templateUrl: './textarea.component.html',
   styleUrl: './textarea.component.scss',

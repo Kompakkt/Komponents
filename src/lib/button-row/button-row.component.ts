@@ -10,7 +10,6 @@ import {
 
 @Component({
   selector: 'k-button-row',
-  standalone: true,
   imports: [],
   templateUrl: './button-row.component.html',
   styleUrl: './button-row.component.scss',
