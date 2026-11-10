@@ -17,6 +17,8 @@ import { ExampleSelectComponent } from './examples/select/select.component';
 import ExampleSelectComponentTemplate from './examples/select/select.component.html';
 import { ExampleExternalStateComponent } from './examples/external-state/external-state.component';
 import ExampleExternalStateComponentTemplate from './examples/external-state/external-state.component.html';
+import { ExampleSignalFormsComponent } from './examples/signal-forms/signal-forms.component';
+import ExampleSignalFormsComponentTemplate from './examples/signal-forms/signal-forms.component.html';
 
 @Component({
   selector: 'app-root',
@@ -30,6 +32,7 @@ import ExampleExternalStateComponentTemplate from './examples/external-state/ext
     ExampleWizardComponent,
     ExampleSelectComponent,
     ExampleExternalStateComponent,
+    ExampleSignalFormsComponent,
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
@@ -45,5 +48,6 @@ export class AppComponent {
     wizard: ExampleWizardComponentTemplate,
     select: ExampleSelectComponentTemplate,
     externalState: ExampleExternalStateComponentTemplate,
+    signalForms: ExampleSignalFormsComponentTemplate,
   };
 }

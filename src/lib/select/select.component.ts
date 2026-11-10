@@ -9,10 +9,12 @@ import {
   input,
   model,
   OnDestroy,
+  output,
   QueryList,
   signal,
   viewChild,
 } from '@angular/core';
+import { FormValueControl, ValidationError } from '@angular/forms/signals';
 
 import { MenuOptionComponent } from '../menu-option/menu-option.component';
 import { setupMarquee } from '../shared/marquee';
@@ -24,13 +26,21 @@ import { setupMarquee } from '../shared/marquee';
   styleUrl: './select.component.scss',
   host: { '[class]': '"size-" + size()' },
 })
-export class SelectComponent implements AfterContentInit, OnDestroy {
+export class SelectComponent implements FormValueControl<string>, AfterContentInit, OnDestroy {
   label = input<string>();
   size = input<'sm' | 'md' | 'lg'>('md');
   placeholder = input<string>('Select...');
   disabled = input(false, { transform: booleanAttribute });
+  required = input(false, { transform: booleanAttribute });
 
   value = model<string>('');
+
+  invalid = input(false);
+  errors = input<readonly ValidationError.WithOptionalFieldTree[]>([]);
+  // Defaults to true so standalone consumers passing [invalid] see the state
+  // immediately; the [formField] directive writes false on init when bound.
+  touched = input(true);
+  touch = output<void>();
 
   open = signal(false);
   triggerText = signal<string>('');
@@ -47,7 +57,7 @@ export class SelectComponent implements AfterContentInit, OnDestroy {
     effect(() => {
       const value = this.value();
       if (!value) return;
-      this.#applyValue(value);
+      this.#syncFromBoundValue(value);
     });
     effect(onCleanup => {
       void this.triggerText();
@@ -59,7 +69,7 @@ export class SelectComponent implements AfterContentInit, OnDestroy {
 
   ngAfterContentInit(): void {
     this.#setupAnchor();
-    this.#syncFromBoundValue();
+    this.#syncFromBoundValue(this.value());
     this.#watchOptions();
   }
 
@@ -81,13 +91,21 @@ export class SelectComponent implements AfterContentInit, OnDestroy {
   #applyValue(optionValue: string): void {
     if (!this.options?.length) return;
     const option = this.options.find(o => o.value() === optionValue);
-    if (!option || option.isDisabled) {
-      this.value.set('');
-      return;
-    }
+    if (!option || option.isDisabled) return;
     this.value.set(optionValue);
     this.triggerText.set(option.elementRef.nativeElement.textContent?.trim() ?? '');
     this.options.forEach(o => (o.selected = o.value() === optionValue));
+  }
+
+  #syncFromBoundValue(value: string): void {
+    if (!value) return;
+    this.#applyValue(value);
+  }
+
+  #watchOptions(): void {
+    this.#optionsSub = this.options.changes.subscribe(() => {
+      this.#syncFromBoundValue(this.value());
+    });
   }
 
   onDropdownClick(event: Event): void {
@@ -110,17 +128,5 @@ export class SelectComponent implements AfterContentInit, OnDestroy {
     const anchorName = `--anchor-${id}`;
     (trigger.style as unknown as Record<string, string>)['anchorName'] = anchorName;
     (dd.style as unknown as Record<string, string>)['positionAnchor'] = anchorName;
-  }
-
-  #syncFromBoundValue(): void {
-    const value = this.value();
-    if (!value) return;
-    this.#applyValue(value);
-  }
-
-  #watchOptions(): void {
-    this.#optionsSub = this.options.changes.subscribe(() => {
-      this.#syncFromBoundValue();
-    });
   }
 }

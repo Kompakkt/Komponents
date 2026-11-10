@@ -47,6 +47,19 @@
     border-radius: 4px;
     border: 1px solid var(--color-gray-12);
     background: var(--color-gray-dark);
+
+    &.invalid {
+      border-color: var(--color-warn, #f77159);
+    }
+  }
+
+  div.error-messages {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+
+    color: var(--color-warn, #f77159);
+    font-size: 12px;
   }
 
   &.size-sm {

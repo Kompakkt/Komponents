@@ -1,14 +1,17 @@
 import {
   AfterViewInit,
   Component,
+  computed,
   DestroyRef,
   ElementRef,
-  computed,
   inject,
   input,
   model,
+  OnInit,
+  output,
   viewChild,
 } from '@angular/core';
+import { FormValueControl } from '@angular/forms/signals';
 
 @Component({
   selector: 'k-slider',
@@ -21,14 +24,28 @@ import {
     '[class.bottom-to-top]': 'direction() === "bottom-to-top"',
   },
 })
-export class SliderComponent implements AfterViewInit {
+export class SliderComponent implements FormValueControl<number>, AfterViewInit, OnInit {
   label = input.required<string>();
-  min = input(0);
-  max = input(100);
   showLabel = input(true);
   step = input(0.1);
   value = model(0);
   direction = input<'left-to-right' | 'bottom-to-top'>('left-to-right');
+
+  disabled = input(false);
+  readonly = input(false);
+  invalid = input(false);
+  touched = input(false);
+  touch = output<void>();
+
+  // When bound to a Signal Form field, schema constraints (min/max) are written
+  // into these inputs by the FormField directive and take priority. Without a
+  // schema rule the directive writes `undefined`, so fall back to the static value.
+  min = input<number | undefined>(0);
+  max = input<number | undefined>(100);
+  #staticMin?: number;
+  #staticMax?: number;
+  effectiveMin = computed(() => this.min() ?? this.#staticMin ?? 0);
+  effectiveMax = computed(() => this.max() ?? this.#staticMax ?? 100);
 
   showInfo = input(true);
   showTooltip = input(true);
@@ -39,10 +56,17 @@ export class SliderComponent implements AfterViewInit {
   isDragging = false;
 
   handlePosition = computed(() => {
-    return ((this.value() - this.min()) / (this.max() - this.min())) * 100;
+    return (
+      ((this.value() - this.effectiveMin()) / (this.effectiveMax() - this.effectiveMin())) * 100
+    );
   });
 
   #destroyRef = inject(DestroyRef);
+
+  ngOnInit(): void {
+    this.#staticMin = this.min();
+    this.#staticMax = this.max();
+  }
 
   ngAfterViewInit(): void {
     const rail = this.railRef().nativeElement;
@@ -73,6 +97,8 @@ export class SliderComponent implements AfterViewInit {
   }
 
   #updateValue(event: MouseEvent) {
+    if (this.disabled() || this.readonly()) return;
+
     const railElement = this.railRef().nativeElement;
     const railRect = railElement.getBoundingClientRect();
     const handleElement = this.handleRef().nativeElement;
@@ -94,10 +120,12 @@ export class SliderComponent implements AfterViewInit {
       }
     })();
 
-    const newValue = this.min() + (clickPosition / availableSpace) * (this.max() - this.min());
+    const newValue =
+      this.effectiveMin() +
+      (clickPosition / availableSpace) * (this.effectiveMax() - this.effectiveMin());
     const steppedValue = Math.round(newValue / this.step()) * this.step();
     const decimalPlacesOfStep = this.step().toString().split('.').at(1)?.length ?? 0;
     const roundedValue = parseFloat(steppedValue.toFixed(decimalPlacesOfStep));
-    this.value.set(Math.min(Math.max(roundedValue, this.min()), this.max()));
+    this.value.set(Math.min(Math.max(roundedValue, this.effectiveMin()), this.effectiveMax()));
   }
 }

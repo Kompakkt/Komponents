@@ -1,4 +1,14 @@
-import { Component, ElementRef, HostBinding, input, model, viewChild } from '@angular/core';
+import {
+  booleanAttribute,
+  Component,
+  ElementRef,
+  HostBinding,
+  input,
+  model,
+  output,
+  viewChild,
+} from '@angular/core';
+import { FormValueControl, ValidationError } from '@angular/forms/signals';
 
 @Component({
   selector: 'k-textarea',
@@ -7,7 +17,7 @@ import { Component, ElementRef, HostBinding, input, model, viewChild } from '@an
   styleUrl: './textarea.component.scss',
   host: { '[class]': '"size-" + size()' },
 })
-export class TextareaComponent {
+export class TextareaComponent implements FormValueControl<string> {
   textarea = viewChild.required<ElementRef<HTMLTextAreaElement>>('textarea');
 
   size = input<'sm' | 'md' | 'lg'>('md');
@@ -24,6 +34,16 @@ export class TextareaComponent {
   resize = input<'none' | 'both' | 'horizontal' | 'vertical'>('vertical', {
     alias: 'resize',
   });
+
+  disabled = input(false, { transform: booleanAttribute });
+  readonly = input(false, { transform: booleanAttribute });
+  required = input(false, { transform: booleanAttribute });
+  invalid = input(false);
+  errors = input<readonly ValidationError.WithOptionalFieldTree[]>([]);
+  // Defaults to true so standalone consumers passing [invalid] see the state
+  // immediately; the [formField] directive writes false on init when bound.
+  touched = input(true);
+  touch = output<void>();
 
   onValueChangeEvent(event: Event) {
     const el = event.target as HTMLInputElement;

@@ -54,6 +54,19 @@
     display: flex;
     flex-direction: column;
     align-items: stretch;
+
+    &.invalid {
+      border-color: var(--color-warn, #f77159);
+    }
+  }
+
+  .error-messages {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+
+    color: var(--color-warn, #f77159);
+    font-size: 12px;
   }
 
   textarea {

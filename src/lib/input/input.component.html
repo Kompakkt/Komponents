@@ -1,21 +1,34 @@
 <span class="label">{{ label() }}</span>
 <div
   class="input-wrapper"
+  [class.invalid]="invalid() && touched()"
   [style.--pre-width]="prefixEl.clientWidth + 'px'"
   [style.--suf-width]="suffixEl.clientWidth + 'px'"
 >
   <span class="prefix" #prefixEl>{{ prefix() }}</span>
   <input
     [type]="type()"
-    [min]="type() === 'number' ? min() : null"
-    [max]="type() === 'number' ? max() : null"
+    [min]="type() === 'number' ? (effectiveMin() ?? null) : null"
+    [max]="type() === 'number' ? (effectiveMax() ?? null) : null"
     [autocomplete]="autocomplete()"
     [value]="value()"
     [placeholder]="placeholder()"
+    [disabled]="disabled()"
+    [readOnly]="readonly()"
+    [attr.required]="required() || null"
+    [attr.aria-invalid]="invalid() && touched() ? true : null"
+    [attr.aria-describedby]="touched() && invalid() && errors().length ? 'k-input-errors' : null"
     (input)="onValueChangeEvent($event)"
     (change)="onValueChangeEvent($event)"
     (focus)="focused.set(true)"
-    (blur)="focused.set(false)"
+    (blur)="focused.set(false); touch.emit()"
   />
   <span class="suffix" #suffixEl>{{ suffix() }} </span>
 </div>
+@if (touched() && invalid() && errors().length) {
+  <div class="error-messages" role="alert" id="k-input-errors">
+    @for (error of errors(); track $index) {
+      <span class="error">{{ error.message }}</span>
+    }
+  </div>
+}

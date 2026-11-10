@@ -1,10 +1,23 @@
 <span class="label">{{ label() }}</span>
-<div class="textarea-wrapper">
+<div class="textarea-wrapper" [class.invalid]="invalid() && touched()">
   <textarea
     #textarea
     [value]="value()"
     [placeholder]="placeholder()"
+    [disabled]="disabled()"
+    [readOnly]="readonly()"
+    [attr.required]="required() || null"
+    [attr.aria-invalid]="invalid() && touched() ? true : null"
+    [attr.aria-describedby]="touched() && invalid() && errors().length ? 'k-textarea-errors' : null"
     (input)="onValueChangeEvent($event)"
     (change)="onValueChangeEvent($event)"
+    (blur)="touch.emit()"
   ></textarea>
 </div>
+@if (touched() && invalid() && errors().length) {
+  <div class="error-messages" role="alert" id="k-textarea-errors">
+    @for (error of errors(); track $index) {
+      <span class="error">{{ error.message }}</span>
+    }
+  </div>
+}

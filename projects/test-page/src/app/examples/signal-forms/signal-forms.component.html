@@ -1,0 +1,37 @@
+<h2>Signal Forms</h2>
+<p>
+  All form controls below are bound with the <code>[formField]</code> directive. Validation rules
+  live in the form schema, state flows into the controls automatically.
+</p>
+
+<form (submit)="$event.preventDefault(); onSubmit()" novalidate>
+  <k-input [formField]="demoForm.name" label="Name" placeholder="Jane Doe" [floatingLabel] />
+
+  <k-textarea [formField]="demoForm.bio" label="Bio" placeholder="Tell us about yourself" />
+
+  <k-select [formField]="demoForm.role" label="Role" placeholder="Choose a role...">
+    <k-menu-option value="developer">Developer</k-menu-option>
+    <k-menu-option value="designer">Designer</k-menu-option>
+    <k-menu-option value="manager">Manager</k-menu-option>
+  </k-select>
+
+  <k-slider [formField]="demoForm.experience" label="Experience (years)" [step]="1" />
+
+  <k-slide-toggle [formField]="demoForm.newsletter" label="Subscribe to newsletter" />
+
+  <k-labelled-checkbox [formField]="demoForm.acceptTerms" label="Accept the terms" />
+
+  <div class="form-actions">
+    <button type="submit">Submit</button>
+    <button type="button" (click)="onReset()">Reset</button>
+  </div>
+</form>
+
+<div class="form-state">
+  <span>invalid: {{ demoForm().invalid() }}</span>
+  <span>touched: {{ demoForm().touched() }}</span>
+  @if (submitted()) {
+    <span>submitted!</span>
+  }
+  <pre>{{ modelJson() }}</pre>
+</div>
