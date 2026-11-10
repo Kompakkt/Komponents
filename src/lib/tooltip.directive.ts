@@ -12,7 +12,6 @@ type TooltipPosition = 'above' | 'below' | 'left' | 'right';
 
 @Directive({
   selector: '[tooltip]',
-  standalone: true,
 })
 export class TooltipDirective implements AfterViewInit, OnDestroy {
   tooltip = input.required<string>();

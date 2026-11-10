@@ -3,7 +3,7 @@
 }
 <div class="slider-container" [class.show-info]="showInfo()">
   @if (showInfo()) {
-    <span class="info-value min">{{ min() }}</span>
+    <span class="info-value min">{{ effectiveMin() }}</span>
   }
   <div class="slider-rail" #rail>
     <div
@@ -18,6 +18,6 @@
     </div>
   </div>
   @if (showInfo()) {
-    <span class="info-value max">{{ max() }}</span>
+    <span class="info-value max">{{ effectiveMax() }}</span>
   }
 </div>

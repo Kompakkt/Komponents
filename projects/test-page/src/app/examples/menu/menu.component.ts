@@ -8,7 +8,6 @@ import {
 
 @Component({
   selector: 'example-menu',
-  standalone: true,
   imports: [ButtonComponent, ButtonRowComponent, MenuComponent, MenuOptionComponent],
   templateUrl: './menu.component.html',
   styleUrl: './menu.component.scss',

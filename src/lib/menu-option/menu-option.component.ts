@@ -2,7 +2,6 @@ import { Component, ElementRef, HostBinding, inject, input } from '@angular/core
 
 @Component({
   selector: 'k-menu-option',
-  standalone: true,
   imports: [],
   templateUrl: './menu-option.component.html',
   styleUrl: './menu-option.component.scss',

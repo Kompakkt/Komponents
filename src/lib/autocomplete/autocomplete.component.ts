@@ -3,7 +3,6 @@ import { InputComponent } from '../input/input.component';
 
 @Component({
   selector: 'k-autocomplete',
-  standalone: true,
   imports: [],
   templateUrl: './autocomplete.component.html',
   styleUrl: './autocomplete.component.scss',

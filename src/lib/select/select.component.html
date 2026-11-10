@@ -1,7 +1,16 @@
 @if (label(); as label) {
   <span class="label">{{ label }}</span>
 }
-<button class="trigger" type="button" [disabled]="disabled()">
+<button
+  class="trigger"
+  type="button"
+  [class.invalid]="invalid() && touched()"
+  [disabled]="disabled()"
+  [attr.aria-invalid]="invalid() && touched() ? true : null"
+  [attr.aria-describedby]="touched() && invalid() && errors().length ? 'k-select-errors' : null"
+  [attr.required]="required() || null"
+  (blur)="touch.emit()"
+>
   <span class="trigger-viewport">
     <span #triggerTextEl class="trigger-text">{{ triggerText() || placeholder() }}</span>
   </span>
@@ -16,3 +25,10 @@
 >
   <ng-content />
 </div>
+@if (touched() && invalid() && errors().length) {
+  <div class="error-messages" role="alert" id="k-select-errors">
+    @for (error of errors(); track $index) {
+      <span class="error">{{ error.message }}</span>
+    }
+  </div>
+}

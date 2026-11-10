@@ -10,7 +10,6 @@ import {
 
 @Component({
   selector: 'k-wizard-step',
-  standalone: true,
   imports: [],
   templateUrl: './wizard-step.component.html',
   styleUrl: './wizard-step.component.scss',

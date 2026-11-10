@@ -12,7 +12,6 @@ import {
 
 @Component({
   selector: 'example-external-state',
-  standalone: true,
   imports: [
     InputComponent,
     LabelledCheckboxComponent,
